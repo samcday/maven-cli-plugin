@@ -9,8 +9,7 @@ import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,6 +74,8 @@ public class ExecuteCliMojo extends AbstractMojo {
                 }
             });
 
+    private static final String HELP_COMMAND = "help";
+
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
      * 
@@ -118,11 +119,7 @@ public class ExecuteCliMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         // build a list of command aliases
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.putAll(defaultAliases);
-        if (commands != null) {
-            aliases.putAll(commands);
-        }
+        Map<String, String> aliases = buildCommands();
 
         // build list of commands available for completion
         List<String> availableCommands = new ArrayList<String>();
@@ -151,6 +148,8 @@ public class ExecuteCliMojo extends AbstractMojo {
                                         + ((MavenProject) reactorProject)
                                                 .getArtifactId());
                     }
+                } else if (HELP_COMMAND.equals(line)) {
+                    printHelp();
                 } else {
                     List<MojoCall> calls = new ArrayList<MojoCall>();
                     try {
@@ -179,6 +178,59 @@ public class ExecuteCliMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to execute cli commands",
                     e);
         }
+    }
+
+    private Map<String, String> buildCommands()
+    {
+        Map<String, String> aliases = new HashMap<String, String>();
+        aliases.putAll(defaultAliases);
+        if (commands != null) {
+            aliases.putAll(commands);
+        }
+        return aliases;
+    }
+
+    private void printHelp()
+    {
+        StringWriter writer = new StringWriter();
+        PrintWriter pw = new PrintWriter(writer);
+
+        Map<String,String> commands = buildCommands();
+        int maxLength = 0;
+        for (String key : commands.keySet()) {
+            maxLength = Math.max(maxLength, key.length());
+        }
+
+        pw.println("Commands: ");
+        for (Map.Entry<String,String> cmd : buildCommands().entrySet()) {
+            pw.print("  ");
+            pw.print(cmd.getKey());
+            pw.print("  ");
+            for (int x=0; x<(maxLength - cmd.getKey().length()); x++) {
+                pw.print(" ");
+            }
+            pw.println(cmd.getValue());
+        }
+        pw.println("Exit commands: ");
+        pw.print("  ");
+        pw.println(join(exitCommands));
+
+        pw.println("List module commands: ");
+        pw.print("  ");
+        pw.print(join(listCommands));
+        getLog().info(writer.toString());
+    }
+
+
+    private String join(List<String> list) {
+        StringBuffer sb = new StringBuffer();
+        for (int x=0; x<list.size(); x++) {
+            sb.append(list.get(x));
+            if (x + 1 < list.size()) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
     }
 
     /**

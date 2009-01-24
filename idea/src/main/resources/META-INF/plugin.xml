@@ -17,14 +17,14 @@
             <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl F3"/>
         </action>
     </actions>
-  <name>Maven CLI Client</name>
+  <name>${project.name}</name>
     <project-components>
         <component>
             <implementation-class>org.twdata.maven.cli.CliClientProjectComponent</implementation-class>
         </component>
     </project-components>
-    <description>This plugin sends commands over tcp to a listening instance of the Maven CLI Plugin</description>
-  <version>0.1</version>
+    <description>${project.description}</description>
+  <version>${project.version}</version>
   <vendor>Don Brown</vendor>
   <idea-version since-build="4121" />
 </idea-plugin>

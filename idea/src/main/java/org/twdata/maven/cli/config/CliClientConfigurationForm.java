@@ -8,11 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mrdon
- * Date: 24/01/2009
- * Time: 3:15:17 PM
- * To change this template use File | Settings | File Templates.
+ * Configuration form for commands
  */
 public class CliClientConfigurationForm {
     private JTextField remoteHost1Field;

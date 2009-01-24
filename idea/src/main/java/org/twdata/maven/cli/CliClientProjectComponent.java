@@ -21,15 +21,15 @@ import java.io.PrintStream;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mrdon
- * Date: 24/01/2009
- * Time: 2:28:49 PM
- * To change this template use File | Settings | File Templates.
+ * Manages operations with remote CLI instances
  */
 public class CliClientProjectComponent implements ProjectComponent, Configurable, JDOMExternalizable {
 
-    public RemoteCommand[] commands;
+    private final RemoteCommand[] commands = new RemoteCommand[] {
+                new RemoteCommand("localhost", 4330, "compile resources jar install"),
+                new RemoteCommand("localhost", 4331, "compile resources jar install"),
+                new RemoteCommand("localhost", 4332, "compile resources jar install")
+            };
 
     private CliClientConfigurationForm form;
 
@@ -54,17 +54,9 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
     }
 
     public void initComponent() {
-        if (commands == null) {
-            commands = new RemoteCommand[] {
-                new RemoteCommand("localhost", 4330, "compile resources jar install"),
-                new RemoteCommand("localhost", 4331, "compile resources jar install"),
-                new RemoteCommand("localhost", 4332, "compile resources jar install")
-            };
-        }
     }
 
     public void disposeComponent() {
-        // TODO: insert component disposal logic here
     }
 
     @NotNull
@@ -73,11 +65,9 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
     }
 
     public void projectOpened() {
-        // called when project is opened
     }
 
     public void projectClosed() {
-        // called when project is being closed
     }
 
     public RemoteCommand[] getRemoteCommands() {
@@ -129,10 +119,19 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
     }
 
     public void readExternal(Element element) throws InvalidDataException {
-        DefaultJDOMExternalizer.readExternal(this, element);
+        Element cmds = element.getChild("commands");
+        for (int x=0; x<cmds.getChildren("command").size(); x++)
+        {
+            commands[x] = new RemoteCommand((Element) cmds.getChildren().get(x));
+        }
     }
 
     public void writeExternal(Element element) throws WriteExternalException {
-        DefaultJDOMExternalizer.writeExternal(this, element);
+        Element cmds = new Element("commands");
+        for (RemoteCommand cmd : commands)
+        {
+            cmds.addContent(cmd.toXml());
+        }
+        element.addContent(cmds);
     }
 }

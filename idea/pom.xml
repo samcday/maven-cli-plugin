@@ -8,11 +8,12 @@
         <version>0.5-SNAPSHOT</version>
     </parent>
 
-
-
   <artifactId>maven-cli-idea-plugin</artifactId>
   <packaging>jar</packaging>
-  <name>Maven CLI IDEA Plugin</name>
+  <name>Maven CLI Client</name>
+    <description>
+        This plugin sends commands over tcp to a listening instance of the Maven CLI Plugin
+    </description>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -92,6 +93,22 @@
   </dependencies>
 
     <build>
+        <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <excludes>
+                            <exclude>**/*.xml</exclude>
+                        </excludes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>**/*.xml</include>
+                        </includes>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+        
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

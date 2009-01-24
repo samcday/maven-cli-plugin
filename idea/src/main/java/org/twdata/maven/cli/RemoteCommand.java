@@ -10,16 +10,12 @@ import java.io.Serializable;
 import org.jdom.Element;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mrdon
- * Date: 24/01/2009
- * Time: 2:36:16 PM
- * To change this template use File | Settings | File Templates.
+ * Configuration used to call a remote CLI instance
  */
-public class RemoteCommand implements Serializable, JDOMExternalizable {
-    public String host;
-    public int port;
-    public String command;
+public class RemoteCommand {
+    private String host;
+    private int port;
+    private String command;
 
     public RemoteCommand()
     {}
@@ -28,6 +24,12 @@ public class RemoteCommand implements Serializable, JDOMExternalizable {
         this.host = host;
         this.port = port;
         this.command = command;
+    }
+
+    public RemoteCommand(Element e) {
+        this.host = e.getAttributeValue("host");
+        this.port = Integer.parseInt(e.getAttributeValue("port"));
+        this.command = e.getAttributeValue("command");
     }
 
     public String getHost() {
@@ -54,11 +56,11 @@ public class RemoteCommand implements Serializable, JDOMExternalizable {
         this.command = command;
     }
 
-    public void readExternal(Element element) throws InvalidDataException {
-        DefaultJDOMExternalizer.readExternal(this, element);
-    }
-
-    public void writeExternal(Element element) throws WriteExternalException {
-        DefaultJDOMExternalizer.writeExternal(this, element);
+    public Element toXml() {
+        Element e = new Element("command");
+        e.setAttribute("host", host);
+        e.setAttribute("port", String.valueOf(port));
+        e.setAttribute("command", command);
+        return e;
     }
 }

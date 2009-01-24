@@ -7,11 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.twdata.maven.cli.CliClientProjectComponent;
 
 /**
- * Created by IntelliJ IDEA.
- * User: mrdon
- * Date: 24/01/2009
- * Time: 3:01:47 PM
- * To change this template use File | Settings | File Templates.
+ * Sends a remote command
  */
 public abstract class AbstractSendRemoteCommandAction extends AnAction {
     private final int index;

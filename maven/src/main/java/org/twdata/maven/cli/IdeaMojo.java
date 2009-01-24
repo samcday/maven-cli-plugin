@@ -45,7 +45,12 @@ public class IdeaMojo extends AbstractMojo {
 
         File pluginsDir = new File(ideaHome, "plugins");
         if (!pluginsDir.exists()) {
-            throw new MojoExecutionException("The IDEA plugins directory cannot be found");
+            File configDir = new File(ideaHome, "config");
+            pluginsDir = new File(configDir, "plugins");
+            if (!pluginsDir.exists()) {
+                System.out.println("dir:"+pluginsDir.getAbsolutePath());
+                throw new MojoExecutionException("The IDEA plugins directory cannot be found");
+            }
         }
 
         File pluginFile = new File(pluginsDir, "maven-cli.jar");

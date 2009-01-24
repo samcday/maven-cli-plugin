@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.twdata.maven</groupId>
+        <artifactId>maven-cli-plugin-parent</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
+
+
+
+  <artifactId>maven-cli-idea-plugin</artifactId>
+  <packaging>jar</packaging>
+  <name>Maven CLI IDEA Plugin</name>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.intellij</groupId>
+            <artifactId>openapi</artifactId>
+                <version>7.0.3</version>
+                <scope>provided</scope>
+                </dependency> 
+    <dependency>
+        <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+                <version>1.1</version>
+                <scope>provided</scope>
+                </dependency> 
+  </dependencies>
+</project>

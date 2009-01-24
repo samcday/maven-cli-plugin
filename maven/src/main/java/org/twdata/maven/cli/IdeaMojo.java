@@ -32,61 +32,50 @@ import org.codehaus.plexus.util.StringUtils;
  * @aggregator true
  * @goal idea
  */
-public class IdeaMojo extends AbstractMojo
-{
-    public void execute() throws MojoExecutionException
-    {
+public class IdeaMojo extends AbstractMojo {
+    public void execute() throws MojoExecutionException {
         String path = System.getProperty("idea.home");
-        if (path == null)
-        {
+        if (path == null) {
             throw new MojoExecutionException("The IDEA home directory must be specified via the 'idea.home' property");
         }
         File ideaHome = new File(path);
-        if (!ideaHome.exists())
-        {
+        if (!ideaHome.exists()) {
             throw new MojoExecutionException("The IDEA home directory doesn't exist");
         }
 
         File pluginsDir = new File(ideaHome, "plugins");
-        if (!pluginsDir.exists())
-        {
+        if (!pluginsDir.exists()) {
             throw new MojoExecutionException("The IDEA plugins directory cannot be found");
         }
 
         File pluginFile = new File(pluginsDir, "maven-cli.jar");
-        if (pluginFile.exists())
-        {
+        if (pluginFile.exists()) {
             pluginFile.delete();
         }
 
         InputStream source = null;
         OutputStream dest = null;
-        try
-        {
+        try {
             dest = new FileOutputStream(pluginFile);
             source = getClass().getResourceAsStream("/maven-cli.jar");
             byte[] buffer = new byte[1024];
             int len;
-            while ((len = source.read(buffer)) > 0)
-            {
+            while ((len = source.read(buffer)) > 0) {
                 dest.write(buffer, 0, len);
             }
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to copy IDEA plugin", e);
         }
-        finally
-        {
-            if (source != null)
-            {
-                    try {
+        finally {
+            if (source != null) {
+                try {
                     source.close();
                 } catch (IOException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
-            if (dest != null)
-            {
-                    try {
+            if (dest != null) {
+                try {
                     dest.close();
                 } catch (IOException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

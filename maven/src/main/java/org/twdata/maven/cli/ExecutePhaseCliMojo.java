@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * Provides an interactive command line interface for Maven plugins, allowing
  * users to execute plugins directly.
- * 
+ *
  * @requiresDependencyResolution execute
  * @aggregator true
  * @goal execute-phase
@@ -87,14 +87,14 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
-     * 
+     *
      * @parameter
      */
     private Map<String, String> userAliases;
 
     /**
      * The Maven Project Object
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -103,7 +103,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     /**
      * The Maven Session Object
-     * 
+     *
      * @parameter expression="${session}"
      * @required
      * @readonly
@@ -112,7 +112,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     /**
      * The Maven PluginManager Object
-     * 
+     *
      * @component
      * @required
      */
@@ -120,7 +120,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     /**
      * The reactor projects.
-     * 
+     *
      * @parameter expression="${reactorProjects}"
      * @readonly
      */
@@ -174,7 +174,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                         getLog().info(
                                 "* "
                                         + ((MavenProject) reactorProject)
-                                                .getArtifactId());
+                                        .getArtifactId());
                     }
                 } else {
                     List<CommandCall> calls = new ArrayList<CommandCall>();
@@ -217,13 +217,10 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     /**
      * Recursively parses commands to resolve all aliases
-     * 
-     * @param text
-     *            The text to evaluate
-     * @param aliases
-     *            The list of aliases available
-     * @param commands
-     *            The list of commands found so far
+     *
+     * @param text     The text to evaluate
+     * @param aliases  The list of aliases available
+     * @param commands The list of commands found so far
      */
     private void parseCommand(String text, List<CommandCall> commands) {
         List<String> tokens = Arrays.asList(text.split(" "));
@@ -269,7 +266,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     }
 
     private CommandCall addProject(List<CommandCall> commands,
-            CommandCall currentCommandCall, MavenProject project) {
+                                   CommandCall currentCommandCall, MavenProject project) {
         if (currentCommandCall == null
                 || !currentCommandCall.getCommands().isEmpty()) {
             currentCommandCall = new CommandCall();
@@ -280,7 +277,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     }
 
     private CommandCall addCommand(List<CommandCall> commands,
-            CommandCall currentCommandCall, String command) {
+                                   CommandCall currentCommandCall, String command) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
             currentCommandCall.getProjets().add(this.project);
@@ -291,7 +288,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     }
 
     private CommandCall addProperty(List<CommandCall> commands,
-            CommandCall currentCommandCall, String property) {
+                                    CommandCall currentCommandCall, String property) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);

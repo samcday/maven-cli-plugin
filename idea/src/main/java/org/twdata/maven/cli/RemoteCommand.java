@@ -17,8 +17,8 @@ public class RemoteCommand {
     private int port;
     private String command;
 
-    public RemoteCommand()
-    {}
+    public RemoteCommand() {
+    }
 
     public RemoteCommand(String host, int port, String command) {
         this.host = host;

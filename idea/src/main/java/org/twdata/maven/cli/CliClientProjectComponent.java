@@ -25,11 +25,11 @@ import java.io.IOException;
  */
 public class CliClientProjectComponent implements ProjectComponent, Configurable, JDOMExternalizable {
 
-    private final RemoteCommand[] commands = new RemoteCommand[] {
-                new RemoteCommand("localhost", 4330, "compile resources jar install"),
-                new RemoteCommand("localhost", 4331, "compile resources jar install"),
-                new RemoteCommand("localhost", 4332, "compile resources jar install")
-            };
+    private final RemoteCommand[] commands = new RemoteCommand[]{
+            new RemoteCommand("localhost", 4330, "compile resources jar install"),
+            new RemoteCommand("localhost", 4331, "compile resources jar install"),
+            new RemoteCommand("localhost", 4332, "compile resources jar install")
+    };
 
     private CliClientConfigurationForm form;
 
@@ -37,7 +37,7 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
     }
 
     public void sendCommand(int index) {
-        RemoteCommand cmd = commands[index-1];
+        RemoteCommand cmd = commands[index - 1];
         try {
             Socket socket = new Socket(cmd.getHost(), cmd.getPort());
             OutputStream out = socket.getOutputStream();
@@ -45,9 +45,9 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
             socket.close();
         } catch (IOException e1) {
             Messages.showMessageDialog(
-                "Unable to send command to "+cmd.getHost()+" on port "+cmd.getPort()+": "+e1.getMessage(),
-                "Error sending command",
-                Messages.getErrorIcon()
+                    "Unable to send command to " + cmd.getHost() + " on port " + cmd.getPort() + ": " + e1.getMessage(),
+                    "Error sending command",
+                    Messages.getErrorIcon()
             );
             e1.printStackTrace();
         }
@@ -100,17 +100,17 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
 
     public void apply() throws ConfigurationException {
         if (form != null) {
-           // Get data from form to component
-           form.getData(this);
-       }
+            // Get data from form to component
+            form.getData(this);
+        }
 
     }
 
     public void reset() {
         if (form != null) {
-           // Reset form data from component
-           form.setData(this);
-       }
+            // Reset form data from component
+            form.setData(this);
+        }
 
     }
 
@@ -120,16 +120,14 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
 
     public void readExternal(Element element) throws InvalidDataException {
         Element cmds = element.getChild("commands");
-        for (int x=0; x<cmds.getChildren("command").size(); x++)
-        {
+        for (int x = 0; x < cmds.getChildren("command").size(); x++) {
             commands[x] = new RemoteCommand((Element) cmds.getChildren().get(x));
         }
     }
 
     public void writeExternal(Element element) throws WriteExternalException {
         Element cmds = new Element("commands");
-        for (RemoteCommand cmd : commands)
-        {
+        for (RemoteCommand cmd : commands) {
             cmds.addContent(cmd.toXml());
         }
         element.addContent(cmds);

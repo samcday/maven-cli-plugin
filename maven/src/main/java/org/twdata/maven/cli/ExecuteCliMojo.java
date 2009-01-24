@@ -33,11 +33,9 @@ import org.codehaus.plexus.util.StringUtils;
  * @aggregator true
  * @goal execute
  */
-public class ExecuteCliMojo extends AbstractMojo
-{
+public class ExecuteCliMojo extends AbstractMojo {
     private final Map<String, String> defaultAliases = Collections
-            .unmodifiableMap(new HashMap<String, String>()
-            {
+            .unmodifiableMap(new HashMap<String, String>() {
                 {
                     put("compile",
                             "org.apache.maven.plugins:maven-compiler-plugin:compile");
@@ -59,8 +57,7 @@ public class ExecuteCliMojo extends AbstractMojo
             });
 
     private final List<String> listCommands = Collections
-            .unmodifiableList(new ArrayList<String>()
-            {
+            .unmodifiableList(new ArrayList<String>() {
                 {
                     add("list");
                     add("ls");
@@ -68,8 +65,7 @@ public class ExecuteCliMojo extends AbstractMojo
             });
 
     private final List<String> exitCommands = Collections
-            .unmodifiableList(new ArrayList<String>()
-            {
+            .unmodifiableList(new ArrayList<String>() {
                 {
                     add("quit");
                     add("exit");
@@ -132,84 +128,64 @@ public class ExecuteCliMojo extends AbstractMojo
     private ServerSocket server = null;
 
 
-    public void execute() throws MojoExecutionException
-    {
-        Thread shell = new Thread()
-        {
+    public void execute() throws MojoExecutionException {
+        Thread shell = new Thread() {
             @Override
-            public void run()
-            {
-                try
-                {
+            public void run() {
+                try {
                     ExecuteCliMojo.this.displayShell(System.in, System.out);
                     acceptSocket = false;
-                    if (server != null)
-                    {
+                    if (server != null) {
                         server.close();
                     }
                 }
-                catch (MojoExecutionException e)
-                {
+                catch (MojoExecutionException e) {
                     throw new RuntimeException(e);
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         };
         shell.start();
 
-        if (port != null)
-        {
-            try
-            {
+        if (port != null) {
+            try {
                 server = new ServerSocket(Integer.parseInt(port));
             }
-            catch (IOException e)
-            {
-                System.out.println("Cannot open port "+port+" for cli server: "+e);
+            catch (IOException e) {
+                System.out.println("Cannot open port " + port + " for cli server: " + e);
             }
             openSocket(server, Integer.parseInt(port));
         }
-        try
-        {
+        try {
             shell.join();
         }
-        catch (InterruptedException e)
-        {
+        catch (InterruptedException e) {
             // ignore
         }
 
     }
 
-    private void openSocket(ServerSocket server, int port) throws MojoExecutionException
-    {
-        System.out.println("Opening port "+port+" for socket cli access");
-        while (acceptSocket)
-        {
+    private void openSocket(ServerSocket server, int port) throws MojoExecutionException {
+        System.out.println("Opening port " + port + " for socket cli access");
+        while (acceptSocket) {
             Socket connection = null;
-            try
-            {
+            try {
                 connection = server.accept();
                 displayShell(connection.getInputStream(), new PrintStream(connection.getOutputStream()));
             }
-            catch (IOException ex)
-            {
+            catch (IOException ex) {
                 System.out.println("Server quit unexpectedly");
                 ex.printStackTrace();
 
             }
-            finally
-            {
-                if (connection != null)
-                {
-                    try
-                    {
+            finally {
+                if (connection != null) {
+                    try {
                         connection.close();
                     }
-                    catch (IOException e)
-                    {
+                    catch (IOException e) {
                         // we really don't care
                     }
                 }
@@ -217,8 +193,7 @@ public class ExecuteCliMojo extends AbstractMojo
         }
     }
 
-    private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException
-    {
+    private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
         // build a list of command aliases
         Map<String, String> aliases = buildCommands();
 
@@ -229,65 +204,47 @@ public class ExecuteCliMojo extends AbstractMojo
         availableCommands.addAll(listCommands);
 
         getLog().info("Waiting for commands");
-        try
-        {
+        try {
             ConsoleReader reader = new ConsoleReader(in,
                     new OutputStreamWriter(out));
             reader.addCompletor(new CommandsCompletor(availableCommands));
             reader.setDefaultPrompt("maven2> ");
             String line;
 
-            while ((line = readCommand(reader)) != null)
-            {
-                if (StringUtils.isEmpty(line))
-                {
+            while ((line = readCommand(reader)) != null) {
+                if (StringUtils.isEmpty(line)) {
                     continue;
-                }
-                else
-                {
-                    if (exitCommands.contains(line))
-                    {
+                } else {
+                    if (exitCommands.contains(line)) {
                         break;
-                    }
-                    else
-                    {
-                        if (listCommands.contains(line))
-                        {
+                    } else {
+                        if (listCommands.contains(line)) {
                             getLog().info("Listing available projects: ");
-                            for (Object reactorProject : reactorProjects)
-                            {
+                            for (Object reactorProject : reactorProjects) {
                                 getLog().info(
                                         "* "
                                                 + ((MavenProject) reactorProject)
                                                 .getArtifactId());
                             }
-                        }
-                        else
-                        {
-                            if (HELP_COMMAND.equals(line))
-                            {
+                        } else {
+                            if (HELP_COMMAND.equals(line)) {
                                 printHelp();
-                            }
-                            else
-                            {
+                            } else {
                                 List<MojoCall> calls = new ArrayList<MojoCall>();
-                                try
-                                {
+                                try {
                                     parseCommand(line, aliases, calls);
                                 }
-                                catch (IllegalArgumentException ex)
-                                {
+                                catch (IllegalArgumentException ex) {
                                     getLog().error("Invalid command: " + line);
                                     continue;
                                 }
 
-                                for (MojoCall call : calls)
-                                {
+                                for (MojoCall call : calls) {
                                     getLog().info("Executing: " + call);
                                     long start = System.currentTimeMillis();
                                     executeMojo(plugin(groupId(call.getGroupId()),
                                             artifactId(call.getArtifactId()), version(call
-                                            .getVersion(project))), goal(call
+                                                    .getVersion(project))), goal(call
                                             .getGoal()), configuration(),
                                             executionEnvironment(project, session,
                                                     pluginManager));
@@ -301,46 +258,39 @@ public class ExecuteCliMojo extends AbstractMojo
                 }
             }
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             throw new MojoExecutionException("Unable to execute cli commands",
                     e);
         }
     }
 
     private Map<String, String> buildCommands
-            ()
-    {
+            () {
         Map<String, String> aliases = new HashMap<String, String>();
         aliases.putAll(defaultAliases);
-        if (commands != null)
-        {
+        if (commands != null) {
             aliases.putAll(commands);
         }
         return aliases;
     }
 
     private void printHelp
-            ()
-    {
+            () {
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
 
         Map<String, String> commands = buildCommands();
         int maxLength = 0;
-        for (String key : commands.keySet())
-        {
+        for (String key : commands.keySet()) {
             maxLength = Math.max(maxLength, key.length());
         }
 
         pw.println("Commands: ");
-        for (Map.Entry<String, String> cmd : buildCommands().entrySet())
-        {
+        for (Map.Entry<String, String> cmd : buildCommands().entrySet()) {
             pw.print("  ");
             pw.print(cmd.getKey());
             pw.print("  ");
-            for (int x = 0; x < (maxLength - cmd.getKey().length()); x++)
-            {
+            for (int x = 0; x < (maxLength - cmd.getKey().length()); x++) {
                 pw.print(" ");
             }
             pw.println(cmd.getValue());
@@ -357,14 +307,11 @@ public class ExecuteCliMojo extends AbstractMojo
 
 
     private String join
-            (List<String> list)
-    {
+            (List<String> list) {
         StringBuffer sb = new StringBuffer();
-        for (int x = 0; x < list.size(); x++)
-        {
+        for (int x = 0; x < list.size(); x++) {
             sb.append(list.get(x));
-            if (x + 1 < list.size())
-            {
+            if (x + 1 < list.size()) {
                 sb.append(", ");
             }
         }
@@ -381,27 +328,18 @@ public class ExecuteCliMojo extends AbstractMojo
     private static void parseCommand
             (String
                     text, Map<String, String> aliases,
-                          List<MojoCall> commands)
-    {
+             List<MojoCall> commands) {
         String[] tokens = text.split(" ");
-        if (tokens.length > 1)
-        {
-            for (String token : tokens)
-            {
+        if (tokens.length > 1) {
+            for (String token : tokens) {
                 parseCommand(token, aliases, commands);
             }
-        }
-        else
-        {
-            if (aliases.containsKey(text))
-            {
+        } else {
+            if (aliases.containsKey(text)) {
                 parseCommand(aliases.get(text), aliases, commands);
-            }
-            else
-            {
+            } else {
                 String[] parsed = text.split(":");
-                if (parsed.length < 3)
-                {
+                if (parsed.length < 3) {
                     throw new IllegalArgumentException("Invalid command: " + text);
                 }
                 commands.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
@@ -411,44 +349,36 @@ public class ExecuteCliMojo extends AbstractMojo
 
     private String readCommand
             (ConsoleReader
-                    reader) throws IOException
-    {
-        try
-        {
+                    reader) throws IOException {
+        try {
             return reader.readLine();
         }
-        catch (SocketException ex)
-        {
+        catch (SocketException ex) {
             // swallow
             return null;
         }
     }
 
-    private static class MojoCall
-    {
+    private static class MojoCall {
         private final String groupId;
         private final String artifactId;
         private final String goal;
 
-        public MojoCall(String groupId, String artifactId, String goal)
-        {
+        public MojoCall(String groupId, String artifactId, String goal) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.goal = goal;
         }
 
-        public String getGroupId()
-        {
+        public String getGroupId() {
             return groupId;
         }
 
-        public String getArtifactId()
-        {
+        public String getArtifactId() {
             return artifactId;
         }
 
-        public String getGoal()
-        {
+        public String getGoal() {
             return goal;
         }
 
@@ -459,43 +389,35 @@ public class ExecuteCliMojo extends AbstractMojo
          * @param project The maven project
          * @return The discovered plugin version
          */
-        public String getVersion(MavenProject project)
-        {
+        public String getVersion(MavenProject project) {
             String version = null;
             List<Plugin> plugins = project.getBuildPlugins();
-            for (Plugin plugin : plugins)
-            {
+            for (Plugin plugin : plugins) {
                 if (groupId.equals(plugin.getGroupId())
-                        && artifactId.equals(plugin.getArtifactId()))
-                {
+                        && artifactId.equals(plugin.getArtifactId())) {
                     version = plugin.getVersion();
                     break;
                 }
             }
 
-            if (version == null)
-            {
+            if (version == null) {
                 plugins = project.getPluginManagement().getPlugins();
-                for (Plugin plugin : plugins)
-                {
+                for (Plugin plugin : plugins) {
                     if (groupId.equals(plugin.getGroupId())
-                            && artifactId.equals(plugin.getArtifactId()))
-                    {
+                            && artifactId.equals(plugin.getArtifactId())) {
                         version = plugin.getVersion();
                         break;
                     }
                 }
             }
 
-            if (version == null)
-            {
+            if (version == null) {
                 version = "RELEASE";
             }
             return version;
         }
 
-        public String toString()
-        {
+        public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append(groupId).append(":").append(artifactId);
             sb.append(" [").append(goal).append("]");

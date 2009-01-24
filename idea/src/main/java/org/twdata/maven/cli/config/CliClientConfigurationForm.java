@@ -66,7 +66,7 @@ public class CliClientConfigurationForm {
     }
 
     public boolean isModified(CliClientProjectComponent data) {
-        for (int pos=1; pos<=3; pos++) {
+        for (int pos = 1; pos <= 3; pos++) {
             for (String type : new String[]{"Host", "Port", "Command"}) {
                 if (isFieldModified(data, type, pos)) {
                     return true;
@@ -78,14 +78,14 @@ public class CliClientConfigurationForm {
 
     private boolean isFieldModified(CliClientProjectComponent data, String type, int pos) {
         try {
-            Field field = getClass().getDeclaredField("remote"+type+pos+"Field");
+            Field field = getClass().getDeclaredField("remote" + type + pos + "Field");
             field.setAccessible(true);
-            String fieldValue = ((JTextField)field.get(this)).getText();
-            RemoteCommand cmd = data.getRemoteCommands()[pos-1];
-            String dataValue = String.valueOf(cmd.getClass().getMethod("get"+type).invoke(cmd));
+            String fieldValue = ((JTextField) field.get(this)).getText();
+            RemoteCommand cmd = data.getRemoteCommands()[pos - 1];
+            String dataValue = String.valueOf(cmd.getClass().getMethod("get" + type).invoke(cmd));
             return fieldValue != null ?
-                            !fieldValue.equals(dataValue) :
-                            dataValue != null;
+                    !fieldValue.equals(dataValue) :
+                    dataValue != null;
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

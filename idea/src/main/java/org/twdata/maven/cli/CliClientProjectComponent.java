@@ -29,11 +29,7 @@ import java.io.IOException;
  */
 public class CliClientProjectComponent implements ProjectComponent, Configurable, JDOMExternalizable {
 
-    public final RemoteCommand[] commands = new RemoteCommand[] {
-        new RemoteCommand("localhost", 4330, "clean"),
-        new RemoteCommand("localhost", 4331, "compile"),
-        new RemoteCommand("localhost", 4332, "compile resources jar install")
-    };
+    public RemoteCommand[] commands;
 
     private CliClientConfigurationForm form;
 
@@ -58,7 +54,13 @@ public class CliClientProjectComponent implements ProjectComponent, Configurable
     }
 
     public void initComponent() {
-        // TODO: insert component initialization logic here
+        if (commands == null) {
+            commands = new RemoteCommand[] {
+                new RemoteCommand("localhost", 4330, "compile resources jar install"),
+                new RemoteCommand("localhost", 4331, "compile resources jar install"),
+                new RemoteCommand("localhost", 4332, "compile resources jar install")
+            };
+        }
     }
 
     public void disposeComponent() {

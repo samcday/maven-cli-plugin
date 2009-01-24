@@ -1,5 +1,14 @@
 package org.twdata.maven.cli;
 
+import com.intellij.openapi.util.JDOMExternalizable;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.DefaultJDOMExternalizer;
+import com.intellij.openapi.util.WriteExternalException;
+
+import java.io.Serializable;
+
+import org.jdom.Element;
+
 /**
  * Created by IntelliJ IDEA.
  * User: mrdon
@@ -7,10 +16,13 @@ package org.twdata.maven.cli;
  * Time: 2:36:16 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RemoteCommand {
-    private String host;
-    private int port;
-    private String command;
+public class RemoteCommand implements Serializable, JDOMExternalizable {
+    public String host;
+    public int port;
+    public String command;
+
+    public RemoteCommand()
+    {}
 
     public RemoteCommand(String host, int port, String command) {
         this.host = host;
@@ -40,5 +52,13 @@ public class RemoteCommand {
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    public void readExternal(Element element) throws InvalidDataException {
+        DefaultJDOMExternalizer.readExternal(this, element);
+    }
+
+    public void writeExternal(Element element) throws WriteExternalException {
+        DefaultJDOMExternalizer.writeExternal(this, element);
     }
 }

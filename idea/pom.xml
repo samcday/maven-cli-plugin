@@ -20,17 +20,96 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-        <groupId>com.intellij</groupId>
-            <artifactId>openapi</artifactId>
-                <version>7.0.3</version>
-                <scope>provided</scope>
-                </dependency> 
-    <dependency>
+      <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>openapi</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>annotations</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>forms_rt</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>jgoodies-forms</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>javac2</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>extensions</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>bootstrap</artifactId>
+                  <version>7.0</version>
+                  <classifier>7590</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>idea</artifactId>
+                  <version>7.0</version>
+                  <classifier>jdk15</classifier>
+                  <scope>compile</scope>
+              </dependency>
+              <dependency>
+                  <groupId>com.intellij.idea</groupId>
+                  <artifactId>idea-junit</artifactId>
+                  <version>7.0</version>
+                  <classifier>jdk15</classifier>
+                  <scope>compile</scope>
+              </dependency>
+        <dependency>    
         <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
                 <version>1.1</version>
                 <scope>provided</scope>
                 </dependency> 
   </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>ideauidesigner-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javac2</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <fork>true</fork>
+                    <debug>true</debug>
+                    <failOnError>true</failOnError>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

@@ -33,6 +33,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @goal idea
  */
 public class IdeaMojo extends AbstractMojo {
+    private static final String MAVEN_CLI_JAR = "maven-cli-idea-plugin.jar";
+
     public void execute() throws MojoExecutionException {
         String path = System.getProperty("idea.home");
         if (path == null) {
@@ -53,7 +55,7 @@ public class IdeaMojo extends AbstractMojo {
             }
         }
 
-        File pluginFile = new File(pluginsDir, "maven-cli.jar");
+        File pluginFile = new File(pluginsDir, MAVEN_CLI_JAR);
         if (pluginFile.exists()) {
             pluginFile.delete();
         }
@@ -62,7 +64,8 @@ public class IdeaMojo extends AbstractMojo {
         OutputStream dest = null;
         try {
             dest = new FileOutputStream(pluginFile);
-            source = getClass().getResourceAsStream("/maven-cli.jar");
+            source = getClass().getResourceAsStream("/"+MAVEN_CLI_JAR);
+
             byte[] buffer = new byte[1024];
             int len;
             while ((len = source.read(buffer)) > 0) {

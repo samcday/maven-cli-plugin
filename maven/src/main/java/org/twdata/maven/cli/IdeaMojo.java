@@ -31,27 +31,21 @@ import org.codehaus.plexus.util.StringUtils;
  * @requiresDependencyResolution execute
  * @aggregator true
  * @goal idea
+ * @requiresProject false
  */
 public class IdeaMojo extends AbstractMojo {
     private static final String MAVEN_CLI_JAR = "maven-cli-idea-plugin.jar";
 
     public void execute() throws MojoExecutionException {
-        String path = System.getProperty("idea.home");
-        if (path == null) {
-            throw new MojoExecutionException("The IDEA home directory must be specified via the 'idea.home' property");
-        }
-        File ideaHome = new File(path);
-        if (!ideaHome.exists()) {
-            throw new MojoExecutionException("The IDEA home directory doesn't exist");
-        }
 
-        File pluginsDir = new File(ideaHome, "plugins");
-        if (!pluginsDir.exists()) {
-            File configDir = new File(ideaHome, "config");
-            pluginsDir = new File(configDir, "plugins");
-            if (!pluginsDir.exists()) {
-                System.out.println("dir:"+pluginsDir.getAbsolutePath());
-                throw new MojoExecutionException("The IDEA plugins directory cannot be found");
+
+        File pluginsDir = determinePluginsDirViaIdeaPlugins();
+        if (pluginsDir == null)
+        {
+            pluginsDir = determinePluginsDirViaIdeaHome();
+            if (pluginsDir == null)
+            {
+                pluginsDir = determinePluginsViaDefaults();
             }
         }
 
@@ -91,5 +85,59 @@ public class IdeaMojo extends AbstractMojo {
             }
         }
         getLog().info("IDEA plugin installed");
+    }
+
+    File determinePluginsDirViaIdeaHome() throws MojoExecutionException
+    {
+        String path = System.getProperty("idea.home");
+        if (path == null) {
+            return null;
+        }
+        File ideaHome = new File(path);
+        if (!ideaHome.exists()) {
+            throw new MojoExecutionException("The IDEA home directory doesn't exist");
+        }
+
+        File pluginsDir = new File(ideaHome, "plugins");
+        if (!pluginsDir.exists()) {
+            File configDir = new File(ideaHome, "config");
+            pluginsDir = new File(configDir, "plugins");
+            if (!pluginsDir.exists()) {
+                throw new MojoExecutionException("The IDEA plugins directory cannot be found at "+pluginsDir.getAbsolutePath());
+            }
+        }
+        return pluginsDir;
+    }
+
+    File determinePluginsDirViaIdeaPlugins() throws MojoExecutionException
+    {
+        String path = System.getProperty("idea.plugins");
+        if (path == null) {
+            return null;
+        }
+        File pluginsDir = new File(path);
+        if (!pluginsDir.exists()) {
+            throw new MojoExecutionException("The IDEA plugins directory cannot be found at "+pluginsDir.getAbsolutePath());
+        }
+        return pluginsDir;
+    }
+
+    File determinePluginsViaDefaults()
+    {
+        String[] paths = new String[] {
+                System.getProperty("user.home") + "/.IntelliJIdea80/config/plugins",
+                System.getProperty("user.home") + "/Library/Application Support/IntelliJIDEA80"
+        };
+
+        for (String path : paths)
+        {
+            String conv = path.replace('/', File.separatorChar);
+            File pluginsDir = new File(conv);
+            if (pluginsDir.exists())
+            {
+                return pluginsDir;
+            }
+        }
+        return null;
     }
 }

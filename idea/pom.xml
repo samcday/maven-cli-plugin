@@ -25,63 +25,63 @@
             <artifactId>openapi</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>annotations</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>forms_rt</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>jgoodies-forms</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>javac2</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>extensions</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>bootstrap</artifactId>
             <version>7.0</version>
             <classifier>7590</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>idea</artifactId>
             <version>7.0</version>
             <classifier>jdk15</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.intellij.idea</groupId>
             <artifactId>idea-junit</artifactId>
             <version>7.0</version>
             <classifier>jdk15</classifier>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>

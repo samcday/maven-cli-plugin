@@ -6,9 +6,9 @@
     <version>0.7-SNAPSHOT</version>
     <name>Maven CLI Plugin Parent</name>
     <url>http://github.com/mrdon/maven-cli-plugin/wikis</url>
-    <prerequisites>
+    <!--prerequisites>
         <maven>2.0.9</maven>
-    </prerequisites>
+    </prerequisites-->
 
     <modules>
         <module>idea</module>

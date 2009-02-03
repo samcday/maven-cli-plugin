@@ -25,6 +25,44 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>maven-cli-idea-plugin</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>openapi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>forms_rt</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>jgoodies-forms</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>javac2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>extensions</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>bootstrap</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>idea</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.intellij.idea</groupId>
+                    <artifactId>idea-junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -53,6 +53,26 @@ public class ExecuteCliMojo extends AbstractMojo {
                             "org.apache.maven.plugins:maven-surefire-plugin:test");
                     put("clean",
                             "org.apache.maven.plugins:maven-clean-plugin:clean");
+                    
+                    //Help plugins not requiring parameters
+                    put("help-system",
+                            "org.apache.maven.plugins:maven-help-plugin:system");
+                    put("help-effectivesettings",
+                            "org.apache.maven.plugins:maven-help-plugin:effective-settings");
+                    put("help-allprofiles",
+                            "org.apache.maven.plugins:maven-help-plugin:all-profiles");
+                    
+                    //Dependency plugins for analysis and management
+                    put("dependency-tree",
+                            "org.apache.maven.plugins:maven-dependency-plugin:tree");
+                    put("dependency-resolve",
+                            "org.apache.maven.plugins:maven-dependency-plugin:resolve");
+                    put("dependency-resolve-plugins",
+                            "org.apache.maven.plugins:maven-dependency-plugin:resolve-plugins");
+                    put("dependency-purge",
+                            "org.apache.maven.plugins:maven-dependency-plugin:purge-local-repository");
+                    put("dependency-analyze",
+                            "org.apache.maven.plugins:maven-dependency-plugin:analyze");
                 }
             });
 
@@ -73,7 +93,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                 }
             });
 
-    private static final String HELP_COMMAND = "help";
+    private static final String HELP_COMMAND = "?";
 
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL

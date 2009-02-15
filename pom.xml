@@ -6,12 +6,7 @@
     <version>0.7-SNAPSHOT</version>
     <name>Maven CLI Plugin Parent</name>
     <url>http://github.com/mrdon/maven-cli-plugin/wikis</url>
-    <!--prerequisites>
-        <maven>2.0.9</maven>
-    </prerequisites-->
-
     <modules>
-        <module>idea</module>
         <module>maven</module>
     </modules>
     <build>
@@ -58,6 +53,20 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>buildidea</id>
+            <activation>
+                <!--Activation is based on the manual installation of the IntelliJ Idea 7.0 JARs via install:install-file -->
+                <file>
+                    <exists>${settings.localRepo}/com/intellij/idea/openapi/7.0/openapi-7.0-7590.jar</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>idea</module>
+            </modules>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
             <id>mojo-executor-repository</id>

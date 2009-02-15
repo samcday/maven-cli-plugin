@@ -22,50 +22,6 @@
             <version>0.9.94</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>maven-cli-idea-plugin</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>openapi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>forms_rt</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>jgoodies-forms</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>javac2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>extensions</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>bootstrap</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>idea</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.intellij.idea</groupId>
-                    <artifactId>idea-junit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
@@ -121,8 +77,8 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                             <excludeTransitive>true</excludeTransitive>
-                             <includeArtifactIds>maven-cli-idea-plugin</includeArtifactIds>
+                            <excludeTransitive>true</excludeTransitive>
+                            <includeArtifactIds>maven-cli-idea-plugin</includeArtifactIds>
                             <stripVersion>true</stripVersion>
                             <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                         </configuration>
@@ -132,4 +88,60 @@
 
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>buildidea</id>
+            <activation>
+                <!--Activation is based on the manual installation of the IntelliJ Idea 7.0 JARs via install:install-file -->
+                <file>
+                    <exists>${settings.localRepo}/com/intellij/idea/openapi/7.0/openapi-7.0-7590.jar</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>maven-cli-idea-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>openapi</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>annotations</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>forms_rt</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>jgoodies-forms</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>javac2</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>extensions</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>bootstrap</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>idea</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.intellij.idea</groupId>
+                            <artifactId>idea-junit</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

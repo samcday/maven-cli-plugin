@@ -259,18 +259,24 @@ public class ExecuteCliMojo extends AbstractMojo {
                                     continue;
                                 }
 
-                                for (MojoCall call : calls) {
-                                    getLog().info("Executing: " + call);
-                                    long start = System.currentTimeMillis();
-                                    executeMojo(plugin(groupId(call.getGroupId()),
-                                            artifactId(call.getArtifactId()), version(call
-                                                    .getVersion(project))), goal(call
-                                            .getGoal()), configuration(),
-                                            executionEnvironment(project, session,
-                                                    pluginManager));
-                                    long now = System.currentTimeMillis();
-                                    getLog().info(
-                                            "Execution time: " + (now - start) + " ms");
+                                try {
+                                    for (MojoCall call : calls) {
+                                        getLog().info("Executing: " + call);
+                                        long start = System.currentTimeMillis();
+                                        executeMojo(plugin(groupId(call.getGroupId()),
+                                                artifactId(call.getArtifactId()), version(call
+                                                        .getVersion(project))), goal(call
+                                                .getGoal()), configuration(),
+                                                executionEnvironment(project, session,
+                                                        pluginManager));
+                                        long now = System.currentTimeMillis();
+                                        getLog().info(
+                                                "Execution time: " + (now - start) + " ms");
+                                    }
+                                }
+                                catch (MojoExecutionException e) {
+                                    //We want to let the user continue entering another command after a plugin call fails, so just print and continue
+                                    e.printStackTrace();
                                 }
                             }
                         }

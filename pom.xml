@@ -66,6 +66,13 @@
                 <module>idea</module>
             </modules>
         </profile>
+        <profile>
+            <id>release</id>
+            <modules>
+                <module>idea</module>
+            </modules>
+        </profile>
+
     </profiles>
     <repositories>
         <repository>

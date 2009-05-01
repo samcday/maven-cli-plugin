@@ -21,6 +21,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainerException;
@@ -61,10 +62,9 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private final List<String> defaultProperties = Collections
             .unmodifiableList(new ArrayList<String>() {
                 {
-                    add("-o");
-                    add("-N");
-                    add("-Dmaven.test.skip=true");
-                    add("-DskipTests");
+                    add("-o"); // offline mode
+                    add("-N"); // don't recurse
+                    add("-S"); // skip tests
                 }
             });
 
@@ -132,6 +132,8 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     protected Maven embeddedMaven;
     protected File userDir;
 
+    private boolean pluginExecutionOfflineMode;
+
     public void execute() throws MojoExecutionException {
         modules = new HashMap<String, MavenProject>();
         for (Object reactorProject : reactorProjects) {
@@ -142,6 +144,8 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         if (userAliases == null) {
             userAliases = new HashMap<String, String>();
         }
+
+        pluginExecutionOfflineMode = session.getSettings().isOffline();
 
         initEmbeddedMaven();
 
@@ -223,7 +227,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
      * @param commands The list of commands found so far
      */
     private void parseCommand(String text, List<CommandCall> commands) {
-        List<String> tokens = Arrays.asList(text.split(" "));
+        List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
 
         // resolve aliases
         int i = 0;
@@ -252,8 +256,16 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                                 currentCommandCall, modules.get(moduleName));
                     }
                 }
-            } else if (token.startsWith("-")) {
+            } else if (token.equals("-o")) {
+                goOffline(commands, currentCommandCall);
+            } else if (token.equals("-N")) {
+                disableRecursive(commands, currentCommandCall);
+            } else if (token.equals("-S")) {
+                addProperty(commands, currentCommandCall, "-Dmaven.test.skip=true");
+            } else if (token.startsWith("-D")) {
                 addProperty(commands, currentCommandCall, token);
+            } else if (token.startsWith("-P")) {
+                addProfile(commands, currentCommandCall, token);
             } else {
                 currentCommandCall = addCommand(commands, currentCommandCall,
                         token);
@@ -272,7 +284,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);
         }
-        currentCommandCall.getProjets().add(project);
+        currentCommandCall.getProjects().add(project);
         return currentCommandCall;
     }
 
@@ -280,10 +292,46 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                                    CommandCall currentCommandCall, String command) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
-            currentCommandCall.getProjets().add(this.project);
+            currentCommandCall.getProjects().add(this.project);
             commands.add(currentCommandCall);
         }
         currentCommandCall.getCommands().add(command);
+        return currentCommandCall;
+    }
+
+    private CommandCall disableRecursive(List<CommandCall> commands,
+                                    CommandCall currentCommandCall) {
+        if (currentCommandCall == null) {
+            currentCommandCall = new CommandCall();
+            commands.add(currentCommandCall);
+        }
+        currentCommandCall.doNotRecurse();
+        return currentCommandCall;
+    }
+
+    private CommandCall goOffline(List<CommandCall> commands,
+                                    CommandCall currentCommandCall) {
+        if (currentCommandCall == null) {
+            currentCommandCall = new CommandCall();
+            commands.add(currentCommandCall);
+        }
+        currentCommandCall.goOffline();
+        return currentCommandCall;
+    }
+
+    private CommandCall addProfile(List<CommandCall> commands,
+                                    CommandCall currentCommandCall, String profile) {
+        if (currentCommandCall == null) {
+            currentCommandCall = new CommandCall();
+            commands.add(currentCommandCall);
+        }
+        // must have characters after -P
+        if (profile.length() < 3) {
+            return currentCommandCall;
+        }
+
+        profile = profile.substring(2);
+        currentCommandCall.getProfiles().add(profile);
         return currentCommandCall;
     }
 
@@ -293,31 +341,44 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);
         }
+        // must have characters after -D
+        if (property.length() < 3) {
+            return currentCommandCall;
+        }
+
         property = property.substring(2);
-        String[] propertyTokens = property.split("=");
-        String key = propertyTokens[0];
-        String value = "";
-        if (propertyTokens.length > 1) {
-            value = propertyTokens[1];
+        String key = property;
+        String value = "1";
+        if (property.indexOf("=") >= 0) {
+            String[] propertyTokens = property.split("=");
+            key = propertyTokens[0];
+            if (propertyTokens.length > 1) {
+                value = propertyTokens[1];
+            }
         }
         currentCommandCall.getProperties().put(key, value);
         return currentCommandCall;
     }
 
     private void executeCommand(CommandCall commandCall) {
-        for (MavenProject currentProject : commandCall.getProjets()) {
+        for (MavenProject currentProject : commandCall.getProjects()) {
             try {
                 session.getExecutionProperties().putAll(
                         commandCall.getProperties());
                 session.setCurrentProject(currentProject);
+                session.getSettings().setOffline(commandCall.isOffline() ? true : pluginExecutionOfflineMode);
+                ProfileManager profileManager = new DefaultProfileManager(embedder.getContainer(),
+                        commandCall.getProperties());
+                profileManager.explicitlyActivate(commandCall.getProfiles());
                 MavenExecutionRequest request = new DefaultMavenExecutionRequest(
                         session.getLocalRepository(), session.getSettings(),
                         session.getEventDispatcher(),
                         commandCall.getCommands(), userDir.getPath(),
-                        new DefaultProfileManager(embedder.getContainer(),
-                                new Properties()), session
-                                .getExecutionProperties(), project
-                                .getProperties(), true);
+                        profileManager, session.getExecutionProperties(),
+                        project.getProperties(), true);
+                if (!commandCall.isRecursive()) {
+                    request.setRecursive(false);
+                }
                 request.setPomFile(new File(currentProject.getBasedir(),
                         "pom.xml").getPath());
                 embeddedMaven.execute(request);
@@ -333,17 +394,26 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private static class CommandCall {
         private final List<String> commands;
 
+        private final List<String> profiles;
+
         private final List<MavenProject> projects;
 
         private final Properties properties;
 
+        private boolean offline;
+
+        private boolean recursive;
+
         public CommandCall() {
             commands = new ArrayList<String>();
+            profiles = new ArrayList<String>();
             projects = new ArrayList<MavenProject>();
             properties = new Properties();
+            recursive = true;
+            offline = false;
         }
 
-        public List<MavenProject> getProjets() {
+        public List<MavenProject> getProjects() {
             return projects;
         }
 
@@ -351,8 +421,28 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             return commands;
         }
 
+        public List<String> getProfiles() {
+            return profiles;
+        }
+
         public Properties getProperties() {
             return properties;
+        }
+
+        public boolean isOffline() {
+            return offline;
+        }
+
+        public void goOffline() {
+            offline = true;
+        }
+
+        public boolean isRecursive() {
+            return recursive;
+        }
+
+        public void doNotRecurse() {
+            recursive = false;
         }
     }
 }

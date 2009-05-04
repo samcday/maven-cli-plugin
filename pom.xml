@@ -3,7 +3,7 @@
     <groupId>org.twdata.maven</groupId>
     <artifactId>maven-cli-plugin-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.6.3.CR2</version>
     <name>Maven CLI Plugin Parent</name>
     <url>http://github.com/mrdon/maven-cli-plugin/wikis</url>
     <modules>
@@ -88,6 +88,10 @@
             <uniqueVersion>false</uniqueVersion>
             <id>twdata-m2-repository</id>
             <url>svn:https://twdata-m2-repository.googlecode.com/svn</url>
+            <!--
+            <id>repository.jboss.org</id>
+            <url>file:///${user.home}/mirror/checkout/jboss-maven2-repo</url>
+            -->
         </repository>
     </distributionManagement>
 

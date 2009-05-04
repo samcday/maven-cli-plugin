@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -190,7 +191,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                     }
 
                     for (CommandCall call : calls) {
-                        getLog().info("Executing: " + call);
+                        getLog().debug("Executing: " + call);
                         long start = System.currentTimeMillis();
                         executeCommand(call);
                         long now = System.currentTimeMillis();
@@ -233,10 +234,18 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         int i = 0;
         while (i < tokens.size()) {
             String token = tokens.get(i);
-            if (userAliases.containsKey(token)) {
-                String alias = userAliases.get(token);
-                List<String> aliasTokens = Arrays.asList(alias.split(" "));
+            if (StringUtils.isEmpty(token)) {
                 tokens.remove(i);
+                continue;
+            } else if (userAliases.containsKey(token)) {
+                String alias = userAliases.get(token);
+                List<String> aliasTokens = new ArrayList<String>(Arrays.asList(alias.split(" ")));
+                tokens.remove(i);
+                for (Iterator<String> aliasIter = aliasTokens.iterator(); aliasIter.hasNext();) {
+                    if (StringUtils.isEmpty(aliasIter.next())) {
+                        aliasIter.remove();
+                    }
+                }
                 tokens.addAll(i, aliasTokens);
             } else {
                 i++;
@@ -443,6 +452,21 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
         public void doNotRecurse() {
             recursive = false;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for (MavenProject project : projects) {
+                sb.append("project: ").append(project.getArtifactId()).append(" ");
+            }
+            for (String command : commands) {
+                sb.append("command: ").append(command).append(" ");
+            }
+            for (String profile : profiles) {
+                sb.append("profile: ").append(profile).append(" ");
+            }
+            return sb.toString();
         }
     }
 }

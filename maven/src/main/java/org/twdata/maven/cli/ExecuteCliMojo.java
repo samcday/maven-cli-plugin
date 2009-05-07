@@ -45,6 +45,8 @@ public class ExecuteCliMojo extends AbstractMojo {
                     put("war", "org.apache.maven.plugins:maven-war-plugin:war");
                     put("resources",
                             "org.apache.maven.plugins:maven-resources-plugin:resources");
+                    put("testResources",
+                            "org.apache.maven.plugins:maven-resources-plugin:testResources");
                     put("install",
                             "org.apache.maven.plugins:maven-install-plugin:install");
                     put("deploy",
@@ -102,6 +104,13 @@ public class ExecuteCliMojo extends AbstractMojo {
      */
     private Map<String, String> commands;
 
+    /**
+     * Command prompt text.
+     *
+     * @parameter
+     */
+    private String prompt;
+    
     /**
      * TCP port to listen to for shell access
      *
@@ -228,7 +237,7 @@ public class ExecuteCliMojo extends AbstractMojo {
             ConsoleReader reader = new ConsoleReader(in,
                     new OutputStreamWriter(out));
             reader.addCompletor(new CommandsCompletor(availableCommands));
-            reader.setDefaultPrompt("maven2> ");
+            reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
             String line;
 
             while ((line = readCommand(reader)) != null) {

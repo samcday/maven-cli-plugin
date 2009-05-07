@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -94,6 +95,13 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private Map<String, String> userAliases;
 
     /**
+     * Command prompt text.
+     *
+     * @parameter
+     */
+    private String prompt;
+
+    /**
      * The Maven Project Object
      *
      * @parameter expression="${project}"
@@ -165,7 +173,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                     new OutputStreamWriter(System.out));
             reader.addCompletor(new CommandsCompletor(availableCommands));
             reader.setBellEnabled(false);
-            reader.setDefaultPrompt("maven2> ");
+            reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
             String line;
 
             while ((line = readCommand(reader)) != null) {
@@ -372,8 +380,10 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private void executeCommand(CommandCall commandCall) {
         for (MavenProject currentProject : commandCall.getProjects()) {
             try {
-                session.getExecutionProperties().putAll(
-                        commandCall.getProperties());
+                // QUESTION: which should it be?
+                session.getExecutionProperties().putAll(commandCall.getProperties());
+                //project.getProperties().putAll(commandCall.getProperties());
+
                 session.setCurrentProject(currentProject);
                 session.getSettings().setOffline(commandCall.isOffline() ? true : pluginExecutionOfflineMode);
                 ProfileManager profileManager = new DefaultProfileManager(embedder.getContainer(),
@@ -391,6 +401,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 request.setPomFile(new File(currentProject.getBasedir(),
                         "pom.xml").getPath());
                 embeddedMaven.execute(request);
+                getLog().info("Current project: " + project.getArtifactId());
             } catch (Exception e) {
                 getLog().error(
                         "Failed to execute '" + commandCall.getCommands()
@@ -465,6 +476,10 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             }
             for (String profile : profiles) {
                 sb.append("profile: ").append(profile).append(" ");
+            }
+            for (Enumeration propNames = properties.propertyNames(); propNames.hasMoreElements();) {
+                String propName = (String) propNames.nextElement();
+                sb.append("property: ").append(propName).append("=").append(properties.get(propName)).append(" ");
             }
             return sb.toString();
         }

@@ -279,6 +279,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                                                 executionEnvironment(project, session,
                                                         pluginManager));
                                         long now = System.currentTimeMillis();
+                                        getLog().info("Current project: " + project.getArtifactId());
                                         getLog().info(
                                                 "Execution time: " + (now - start) + " ms");
                                     }

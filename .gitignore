@@ -4,3 +4,4 @@ target
 *.ipr
 *.iws
 release.properties
+*.xml.releaseBackup

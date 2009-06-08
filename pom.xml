@@ -99,4 +99,8 @@
         <connection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</connection>
         <url>scm:git:git://github.com/mrdon/maven-cli-plugin.git</url>
     </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 </project>

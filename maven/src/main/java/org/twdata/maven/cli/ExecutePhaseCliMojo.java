@@ -139,36 +139,15 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private boolean pluginExecutionOfflineMode;
 
     public void execute() throws MojoExecutionException {
-        modules = new HashMap<String, MavenProject>();
-        for (Object reactorProject : reactorProjects) {
-            modules.put(((MavenProject) reactorProject).getArtifactId(),
-                    (MavenProject) reactorProject);
-        }
-
-        if (userAliases == null) {
-            userAliases = new HashMap<String, String>();
-        }
-
-        pluginExecutionOfflineMode = session.getSettings().isOffline();
-
+        resolveModulesInProject();
+        resolveUserAliases();
+        resolvePluginExecutionOfflineMode();
         initEmbeddedMaven();
-
-        // build list of commands available for completion
-        List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(defaultPhases);
-        availableCommands.addAll(userAliases.keySet());
-        availableCommands.addAll(exitCommands);
-        availableCommands.addAll(listCommands);
-        availableCommands.addAll(modules.keySet());
-        availableCommands.addAll(defaultProperties);
+        List<String> availableCommands = buildAvailableCommands();
 
         getLog().info("Waiting for commands");
         try {
-            ConsoleReader reader = new ConsoleReader(System.in,
-                    new OutputStreamWriter(System.out));
-            reader.addCompletor(new CommandsCompletor(availableCommands));
-            reader.setBellEnabled(false);
-            reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
+            ConsoleReader reader = createConsoleReader(availableCommands);
             String line;
 
             while ((line = readCommand(reader)) != null) {
@@ -210,6 +189,24 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         }
     }
 
+    private void resolveModulesInProject() {
+        modules = new HashMap<String, MavenProject>();
+        for (Object reactorProject : reactorProjects) {
+            modules.put(((MavenProject) reactorProject).getArtifactId(),
+                    (MavenProject) reactorProject);
+        }
+    }
+
+    private void resolveUserAliases() {
+        if (userAliases == null) {
+            userAliases = new HashMap<String, String>();
+        }
+    }
+
+    private void resolvePluginExecutionOfflineMode() {
+        pluginExecutionOfflineMode = session.getSettings().isOffline();
+    }
+
     private void initEmbeddedMaven() throws MojoExecutionException {
         try {
             embedder = new Embedder();
@@ -221,6 +218,27 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         } catch (ComponentLookupException e) {
             throw new MojoExecutionException(e.getMessage());
         }
+    }
+
+    private List<String> buildAvailableCommands() {
+        List<String> availableCommands = new ArrayList<String>();
+        availableCommands.addAll(defaultPhases);
+        availableCommands.addAll(userAliases.keySet());
+        availableCommands.addAll(exitCommands);
+        availableCommands.addAll(listCommands);
+        availableCommands.addAll(modules.keySet());
+        availableCommands.addAll(defaultProperties);
+
+        return availableCommands;
+    }
+
+    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
+        ConsoleReader reader = new ConsoleReader(System.in,
+                    new OutputStreamWriter(System.out));
+        reader.addCompletor(new CommandsCompletor(availableCommands));
+        reader.setBellEnabled(false);
+        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
+        return reader;
     }
 
     /**

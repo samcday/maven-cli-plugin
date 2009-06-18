@@ -1,6 +1,5 @@
 package org.twdata.maven.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -11,19 +10,11 @@ import java.util.Map;
 
 import jline.ConsoleReader;
 
-import org.apache.maven.Maven;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.profiles.ProfileManager;
-import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.embed.Embedder;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -132,23 +123,16 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     protected Map<String, MavenProject> modules;
 
-    protected Embedder embedder;
-    protected Maven embeddedMaven;
-    protected File userDir;
-
-    private boolean pluginExecutionOfflineMode;
-
     public void execute() throws MojoExecutionException {
         resolveModulesInProject();
         resolveUserAliases();
-        resolvePluginExecutionOfflineMode();
-        initEmbeddedMaven();
         List<String> availableCommands = buildAvailableCommands();
 
         getLog().info("Waiting for commands");
         try {
             ConsoleReader reader = createConsoleReader(availableCommands);
             String line;
+            CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
 
             while ((line = readCommand(reader)) != null) {
                 if (StringUtils.isEmpty(line)) {
@@ -175,7 +159,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                     for (CommandCall call : calls) {
                         getLog().debug("Executing: " + call);
                         long start = System.currentTimeMillis();
-                        executeCommand(call);
+                        runner.executeCommand(call);
                         long now = System.currentTimeMillis();
                         getLog().info(
                                 "Execution time: " + (now - start) + " ms");
@@ -200,23 +184,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
     private void resolveUserAliases() {
         if (userAliases == null) {
             userAliases = new HashMap<String, String>();
-        }
-    }
-
-    private void resolvePluginExecutionOfflineMode() {
-        pluginExecutionOfflineMode = session.getSettings().isOffline();
-    }
-
-    private void initEmbeddedMaven() throws MojoExecutionException {
-        try {
-            embedder = new Embedder();
-            embedder.start();
-            embeddedMaven = (Maven) embedder.lookup(Maven.ROLE);
-            userDir = new File(System.getProperty("user.dir"));
-        } catch (PlexusContainerException e) {
-            throw new MojoExecutionException(e.getMessage());
-        } catch (ComponentLookupException e) {
-            throw new MojoExecutionException(e.getMessage());
         }
     }
 
@@ -254,39 +221,5 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     private String readCommand(ConsoleReader reader) throws IOException {
         return reader.readLine();
-    }
-
-    private void executeCommand(CommandCall commandCall) {
-        for (MavenProject currentProject : commandCall.getProjects()) {
-            try {
-                // QUESTION: which should it be?
-                session.getExecutionProperties().putAll(commandCall.getProperties());
-                //project.getProperties().putAll(commandCall.getProperties());
-
-                session.setCurrentProject(currentProject);
-                session.getSettings().setOffline(commandCall.isOffline() ? true : pluginExecutionOfflineMode);
-                ProfileManager profileManager = new DefaultProfileManager(embedder.getContainer(),
-                        commandCall.getProperties());
-                profileManager.explicitlyActivate(commandCall.getProfiles());
-                MavenExecutionRequest request = new DefaultMavenExecutionRequest(
-                        session.getLocalRepository(), session.getSettings(),
-                        session.getEventDispatcher(),
-                        commandCall.getCommands(), userDir.getPath(),
-                        profileManager, session.getExecutionProperties(),
-                        project.getProperties(), true);
-                if (!commandCall.isRecursive()) {
-                    request.setRecursive(false);
-                }
-                request.setPomFile(new File(currentProject.getBasedir(),
-                        "pom.xml").getPath());
-                embeddedMaven.execute(request);
-                getLog().info("Current project: " + project.getArtifactId());
-            } catch (Exception e) {
-                getLog().error(
-                        "Failed to execute '" + commandCall.getCommands()
-                                + "' on '" + currentProject.getArtifactId()
-                                + "'");
-            }
-        }
     }
 }

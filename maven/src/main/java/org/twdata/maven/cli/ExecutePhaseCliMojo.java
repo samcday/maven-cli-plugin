@@ -174,22 +174,10 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 } else if (listCommands.contains(line)) {
                     listReactorProjects();
                 } else {
-                    List<CommandCall> calls = new ArrayList<CommandCall>();
                     try {
-                        commandCallBuilder.parseCommand(line, calls);
+                        executeLifeCyclePhases(commandCallBuilder, runner, line);
                     } catch (IllegalArgumentException ex) {
-                        getLog().error("Invalid command: " + line);
                         continue;
-                    }
-
-                    for (CommandCall call : calls) {
-                        getLog().debug("Executing: " + call);
-                        long start = System.currentTimeMillis();
-                        runner.executeCommand(call);
-                        long now = System.currentTimeMillis();
-                        getLog().info(
-                                "Execution time: " + (now - start) + " ms");
-
                     }
                 }
             }
@@ -212,6 +200,24 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         getLog().info("Listing available projects: ");
         for (Object reactorProject : reactorProjects) {
             getLog().info("* " + ((MavenProject) reactorProject).getArtifactId());
+        }
+    }
+
+    private void executeLifeCyclePhases(CommandCallBuilder commandCallBuilder,
+            CommandCallRunner runner, String line) {
+        List<CommandCall> calls = new ArrayList<CommandCall>();
+        try {
+            commandCallBuilder.parseCommand(line, calls);
+        } catch (IllegalArgumentException ex) {
+            getLog().error("Invalid command: " + line);
+        }
+
+        for (CommandCall call : calls) {
+            getLog().debug("Executing: " + call);
+            long start = System.currentTimeMillis();
+            runner.executeCommand(call);
+            long now = System.currentTimeMillis();
+            getLog().info("Execution time: " + (now - start) + " ms");
         }
     }
 }

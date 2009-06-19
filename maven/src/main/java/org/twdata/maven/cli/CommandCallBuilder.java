@@ -20,6 +20,7 @@ class CommandCallBuilder {
         this.modules = modules;
         this.userAliases = userAliases;
     }
+
     public void parseCommand(String text, List<CommandCall> commands) {
         List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
 

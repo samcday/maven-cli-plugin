@@ -172,13 +172,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 } else if (exitCommands.contains(line)) {
                     break;
                 } else if (listCommands.contains(line)) {
-                    getLog().info("Listing available projects: ");
-                    for (Object reactorProject : reactorProjects) {
-                        getLog().info(
-                                "* "
-                                        + ((MavenProject) reactorProject)
-                                        .getArtifactId());
-                    }
+                    listReactorProjects();
                 } else {
                     List<CommandCall> calls = new ArrayList<CommandCall>();
                     try {
@@ -212,5 +206,12 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         reader.setBellEnabled(false);
         reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
         return reader;
+    }
+
+    private void listReactorProjects() {
+        getLog().info("Listing available projects: ");
+        for (Object reactorProject : reactorProjects) {
+            getLog().info("* " + ((MavenProject) reactorProject).getArtifactId());
+        }
     }
 }

@@ -127,7 +127,46 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         resolveModulesInProject();
         resolveUserAliases();
         List<String> availableCommands = buildAvailableCommands();
+        startListeningForCommands(availableCommands);
+    }
 
+    private void resolveModulesInProject() {
+        modules = new HashMap<String, MavenProject>();
+        for (Object reactorProject : reactorProjects) {
+            modules.put(((MavenProject) reactorProject).getArtifactId(),
+                    (MavenProject) reactorProject);
+        }
+    }
+
+    private void resolveUserAliases() {
+        if (userAliases == null) {
+            userAliases = new HashMap<String, String>();
+        }
+    }
+
+    private List<String> buildAvailableCommands() {
+        List<String> availableCommands = new ArrayList<String>();
+        availableCommands.addAll(defaultPhases);
+        availableCommands.addAll(userAliases.keySet());
+        availableCommands.addAll(exitCommands);
+        availableCommands.addAll(listCommands);
+        availableCommands.addAll(modules.keySet());
+        availableCommands.addAll(defaultProperties);
+
+        return availableCommands;
+    }
+
+    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
+        ConsoleReader reader = new ConsoleReader(System.in,
+                    new OutputStreamWriter(System.out));
+        reader.addCompletor(new CommandsCompletor(availableCommands));
+        reader.setBellEnabled(false);
+        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
+        return reader;
+    }
+
+    private void startListeningForCommands(List<String> availableCommands)
+            throws MojoExecutionException {
         getLog().info("Waiting for commands");
         try {
             ConsoleReader reader = createConsoleReader(availableCommands);
@@ -171,41 +210,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to execute cli commands",
                     e);
         }
-    }
-
-    private void resolveModulesInProject() {
-        modules = new HashMap<String, MavenProject>();
-        for (Object reactorProject : reactorProjects) {
-            modules.put(((MavenProject) reactorProject).getArtifactId(),
-                    (MavenProject) reactorProject);
-        }
-    }
-
-    private void resolveUserAliases() {
-        if (userAliases == null) {
-            userAliases = new HashMap<String, String>();
-        }
-    }
-
-    private List<String> buildAvailableCommands() {
-        List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(defaultPhases);
-        availableCommands.addAll(userAliases.keySet());
-        availableCommands.addAll(exitCommands);
-        availableCommands.addAll(listCommands);
-        availableCommands.addAll(modules.keySet());
-        availableCommands.addAll(defaultProperties);
-
-        return availableCommands;
-    }
-
-    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
-        ConsoleReader reader = new ConsoleReader(System.in,
-                    new OutputStreamWriter(System.out));
-        reader.addCompletor(new CommandsCompletor(availableCommands));
-        reader.setBellEnabled(false);
-        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
-        return reader;
     }
 
     /**

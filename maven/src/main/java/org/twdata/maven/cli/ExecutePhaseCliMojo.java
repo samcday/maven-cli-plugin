@@ -174,11 +174,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 } else if (listCommands.contains(line)) {
                     listReactorProjects();
                 } else {
-                    try {
-                        executeLifeCyclePhases(commandCallBuilder, runner, line);
-                    } catch (IllegalArgumentException ex) {
-                        continue;
-                    }
+                    executeLifeCyclePhases(commandCallBuilder, runner, line);
                 }
             }
         } catch (IOException e) {
@@ -210,6 +206,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             commandCallBuilder.parseCommand(line, calls);
         } catch (IllegalArgumentException ex) {
             getLog().error("Invalid command: " + line);
+            return;
         }
 
         for (CommandCall call : calls) {

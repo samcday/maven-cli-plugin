@@ -171,6 +171,8 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         try {
             ConsoleReader reader = createConsoleReader(availableCommands);
             String line;
+            CommandCallBuilder commandCallBuilder =
+                    new CommandCallBuilder(project, modules, userAliases);
             CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
 
             while ((line = readCommand(reader)) != null) {
@@ -189,7 +191,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 } else {
                     List<CommandCall> calls = new ArrayList<CommandCall>();
                     try {
-                        parseCommand(line, calls);
+                        commandCallBuilder.parseCommand(line, calls);
                     } catch (IllegalArgumentException ex) {
                         getLog().error("Invalid command: " + line);
                         continue;
@@ -210,17 +212,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to execute cli commands",
                     e);
         }
-    }
-
-    /**
-     * Recursively parses commands to resolve all aliases
-     *
-     * @param text     The text to evaluate
-     * @param aliases  The list of aliases available
-     * @param commands The list of commands found so far
-     */
-    private void parseCommand(String text, List<CommandCall> commands) {
-        new CommandCallBuilder(project, modules, userAliases).parseCommand(text, commands);
     }
 
     private String readCommand(ConsoleReader reader) throws IOException {

@@ -156,15 +156,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         return availableCommands;
     }
 
-    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
-        ConsoleReader reader = new ConsoleReader(System.in,
-                    new OutputStreamWriter(System.out));
-        reader.addCompletor(new CommandsCompletor(availableCommands));
-        reader.setBellEnabled(false);
-        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
-        return reader;
-    }
-
     private void startListeningForCommands(List<String> availableCommands)
             throws MojoExecutionException {
         getLog().info("Waiting for commands");
@@ -175,7 +166,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                     new CommandCallBuilder(project, modules, userAliases);
             CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
 
-            while ((line = readCommand(reader)) != null) {
+            while ((line = reader.readLine()) != null) {
                 if (StringUtils.isEmpty(line)) {
                     continue;
                 } else if (exitCommands.contains(line)) {
@@ -214,7 +205,12 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         }
     }
 
-    private String readCommand(ConsoleReader reader) throws IOException {
-        return reader.readLine();
+    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
+        ConsoleReader reader = new ConsoleReader(System.in,
+                    new OutputStreamWriter(System.out));
+        reader.addCompletor(new CommandsCompletor(availableCommands));
+        reader.setBellEnabled(false);
+        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
+        return reader;
     }
 }

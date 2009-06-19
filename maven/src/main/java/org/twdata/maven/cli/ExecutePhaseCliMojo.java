@@ -1,21 +1,16 @@
 package org.twdata.maven.cli;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jline.ConsoleReader;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing
@@ -25,7 +20,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @aggregator true
  * @goal execute-phase
  */
-public class ExecutePhaseCliMojo extends AbstractMojo {
+public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpreter {
 
     private final List<String> defaultPhases = Collections
             .unmodifiableList(new ArrayList<String>() {
@@ -61,15 +56,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
                 {
                     add("list");
                     add("ls");
-                }
-            });
-
-    private final List<String> exitCommands = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("quit");
-                    add("exit");
-                    add("bye");
                 }
             });
 
@@ -148,7 +134,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
         List<String> availableCommands = new ArrayList<String>();
         availableCommands.addAll(defaultPhases);
         availableCommands.addAll(userAliases.keySet());
-        availableCommands.addAll(exitCommands);
         availableCommands.addAll(listCommands);
         availableCommands.addAll(modules.keySet());
         availableCommands.addAll(defaultProperties);
@@ -158,38 +143,21 @@ public class ExecutePhaseCliMojo extends AbstractMojo {
 
     private void startListeningForCommands(List<String> availableCommands)
             throws MojoExecutionException {
+        CommandReader reader = new CommandReader(availableCommands, prompt);
         getLog().info("Waiting for commands");
-        try {
-            ConsoleReader reader = createConsoleReader(availableCommands);
-            String line;
-            CommandCallBuilder commandCallBuilder =
-                    new CommandCallBuilder(project, modules, userAliases);
-            CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
-
-            while ((line = reader.readLine()) != null) {
-                if (StringUtils.isEmpty(line)) {
-                    continue;
-                } else if (exitCommands.contains(line)) {
-                    break;
-                } else if (listCommands.contains(line)) {
-                    listReactorProjects();
-                } else {
-                    executeLifeCyclePhases(commandCallBuilder, runner, line);
-                }
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to execute cli commands",
-                    e);
-        }
+        reader.startListening(this);
     }
 
-    private ConsoleReader createConsoleReader(List<String> availableCommands) throws IOException {
-        ConsoleReader reader = new ConsoleReader(System.in,
-                    new OutputStreamWriter(System.out));
-        reader.addCompletor(new CommandsCompletor(availableCommands));
-        reader.setBellEnabled(false);
-        reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
-        return reader;
+    public void interpretCommand(String command) throws MojoExecutionException {
+        CommandCallBuilder commandCallBuilder =
+                new CommandCallBuilder(project, modules, userAliases);
+        CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
+
+        if (listCommands.contains(command)) {
+            listReactorProjects();
+        } else {
+            executeLifeCyclePhases(commandCallBuilder, runner, command);
+        }
     }
 
     private void listReactorProjects() {

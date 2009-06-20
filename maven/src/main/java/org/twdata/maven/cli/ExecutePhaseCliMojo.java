@@ -171,7 +171,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
             CommandCallRunner runner, String line) {
         List<CommandCall> calls = new ArrayList<CommandCall>();
         try {
-            commandCallBuilder.parseCommand(line, calls);
+            calls = commandCallBuilder.parseCommand(line);
         } catch (IllegalArgumentException ex) {
             getLog().error("Invalid command: " + line);
             return;

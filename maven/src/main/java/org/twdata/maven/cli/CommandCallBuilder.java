@@ -21,7 +21,7 @@ class CommandCallBuilder {
         this.userAliases = userAliases;
     }
 
-    public void parseCommand(String text, List<CommandCall> commands) {
+    public List<CommandCall> parseCommand(String text) {
         List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
 
         // resolve aliases
@@ -46,6 +46,7 @@ class CommandCallBuilder {
             }
         }
 
+        List<CommandCall> commands = new ArrayList<CommandCall>();
         CommandCall currentCommandCall = null;
         for (String token : tokens) {
             if (modules.containsKey(token)) {
@@ -74,6 +75,8 @@ class CommandCallBuilder {
                         token);
             }
         }
+
+        return commands;
     }
 
     private CommandCall addProject(List<CommandCall> commands,

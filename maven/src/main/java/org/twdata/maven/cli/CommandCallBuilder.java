@@ -101,14 +101,13 @@ class CommandCallBuilder {
         return currentCommandCall;
     }
 
-    private CommandCall disableRecursive(List<CommandCall> commands,
+    private void disableRecursive(List<CommandCall> commands,
                                     CommandCall currentCommandCall) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);
         }
         currentCommandCall.doNotRecurse();
-        return currentCommandCall;
     }
 
     private void goOffline(List<CommandCall> commands,
@@ -120,7 +119,7 @@ class CommandCallBuilder {
         currentCommandCall.goOffline();
     }
 
-    private CommandCall addProfile(List<CommandCall> commands,
+    private void addProfile(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String profile) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
@@ -128,15 +127,14 @@ class CommandCallBuilder {
         }
         // must have characters after -P
         if (profile.length() < 3) {
-            return currentCommandCall;
+            return;
         }
 
         profile = profile.substring(2);
         currentCommandCall.getProfiles().add(profile);
-        return currentCommandCall;
     }
 
-    private CommandCall addProperty(List<CommandCall> commands,
+    private void addProperty(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String property) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
@@ -144,7 +142,7 @@ class CommandCallBuilder {
         }
         // must have characters after -D
         if (property.length() < 3) {
-            return currentCommandCall;
+            return;
         }
 
         property = property.substring(2);
@@ -158,6 +156,5 @@ class CommandCallBuilder {
             }
         }
         currentCommandCall.getProperties().put(key, value);
-        return currentCommandCall;
     }
 }

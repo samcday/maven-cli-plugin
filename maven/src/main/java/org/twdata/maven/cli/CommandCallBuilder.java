@@ -22,33 +22,10 @@ class CommandCallBuilder {
     }
 
     public List<CommandCall> parseCommand(String text) {
-        List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
-
-        // resolve aliases
-        int i = 0;
-        while (i < tokens.size()) {
-            String token = tokens.get(i);
-            if (StringUtils.isEmpty(token)) {
-                tokens.remove(i);
-                continue;
-            } else if (userAliases.containsKey(token)) {
-                String alias = userAliases.get(token);
-                List<String> aliasTokens = new ArrayList<String>(Arrays.asList(alias.split(" ")));
-                tokens.remove(i);
-                for (Iterator<String> aliasIter = aliasTokens.iterator(); aliasIter.hasNext();) {
-                    if (StringUtils.isEmpty(aliasIter.next())) {
-                        aliasIter.remove();
-                    }
-                }
-                tokens.addAll(i, aliasTokens);
-            } else {
-                i++;
-            }
-        }
-
         List<CommandCall> commands = new ArrayList<CommandCall>();
         CommandCall currentCommandCall = null;
-        for (String token : tokens) {
+
+        for (String token : resolveUserAliases(text)) {
             if (modules.containsKey(token)) {
                 currentCommandCall = addProject(commands, currentCommandCall,
                         modules.get(token));
@@ -77,6 +54,33 @@ class CommandCallBuilder {
         }
 
         return commands;
+    }
+
+    private List<String> resolveUserAliases(String text) {
+        List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
+
+        int i = 0;
+        while (i < tokens.size()) {
+            String token = tokens.get(i);
+            if (StringUtils.isEmpty(token)) {
+                tokens.remove(i);
+                continue;
+            } else if (userAliases.containsKey(token)) {
+                String alias = userAliases.get(token);
+                List<String> aliasTokens = new ArrayList<String>(Arrays.asList(alias.split(" ")));
+                tokens.remove(i);
+                for (Iterator<String> aliasIter = aliasTokens.iterator(); aliasIter.hasNext();) {
+                    if (StringUtils.isEmpty(aliasIter.next())) {
+                        aliasIter.remove();
+                    }
+                }
+                tokens.addAll(i, aliasTokens);
+            } else {
+                i++;
+            }
+        }
+
+        return tokens;
     }
 
     private CommandCall addProject(List<CommandCall> commands,

@@ -111,14 +111,13 @@ class CommandCallBuilder {
         return currentCommandCall;
     }
 
-    private CommandCall goOffline(List<CommandCall> commands,
+    private void goOffline(List<CommandCall> commands,
                                     CommandCall currentCommandCall) {
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);
         }
         currentCommandCall.goOffline();
-        return currentCommandCall;
     }
 
     private CommandCall addProfile(List<CommandCall> commands,

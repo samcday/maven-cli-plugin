@@ -20,43 +20,73 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
 
     public class WhenInputOnlyContainsPhases {
         public void shouldBuildOnlyOneCommandContainingAllThePhases() {
-            CommandCall expected = aCommandCall().hasPhases("clean", "test")
-                    .hasProjects(defaultProject).build();
-
-            assertCommands(builder.parseCommand("clean test"), expected);
+            assertCommands(builder.parseCommand("clean test"),
+                    aCommandCall().hasPhases("clean", "test").hasProjects(defaultProject));
         }
     }
 
     public class WhenInputContainsPhasesAndOfflineSwitch {
         public void shouldBuildOnlyOneCommandWhenSwitchIsSpecifiedAfterPhases() {
-            CommandCall expected = aCommandCall().hasPhases("clean", "test")
-                    .runsOffline().hasProjects(defaultProject).build();
-
-            assertCommands(builder.parseCommand("clean test -o"), expected);
+            assertCommands(builder.parseCommand("clean test -o"),
+                    aCommandCall().hasPhases("clean", "test").runsOffline()
+                            .hasProjects(defaultProject));
         }
 
         public void shouldBuildTwoCommandWhenSwitchIsSpecifiedBeforePhases() {
-            CommandCall expectedOffline = aCommandCall().runsOffline().build();
-            CommandCall expectedPhases = aCommandCall().hasPhases("clean", "test")
-                    .hasProjects(defaultProject).build();
-
             assertCommands(builder.parseCommand("-o clean test"),
-                    expectedOffline, expectedPhases);
+                    aCommandCall().runsOffline(),
+                    aCommandCall().hasPhases("clean", "test").hasProjects(defaultProject));
         }
 
         public void shouldBuildOneCommandEvenWhenSwitchIsSpecifiedBetweenPhases() {
-            CommandCall expected = aCommandCall().hasPhases("clean", "test")
-                    .runsOffline().hasProjects(defaultProject).build();
-
-            assertCommands(builder.parseCommand("clean -o test"), expected);
+            assertCommands(builder.parseCommand("clean -o test"),
+                    aCommandCall().hasPhases("clean", "test").runsOffline()
+                            .hasProjects(defaultProject));
         }
     }
 
-    private void assertCommands(List<CommandCall> actual, CommandCall... expected) {
+    public class WhenOnlySwitchesAreSpecified {
+        public void willBuildOneCommandWhenOnlyOfflineSwitchIsSpecified() {
+            assertCommands(builder.parseCommand("-o"), aCommandCall().runsOffline());
+        }
+
+        public void willBuildOneCommandWhenOnlyDoNotRecurseSwitchIsSpecified() {
+            assertCommands(builder.parseCommand("-N"), aCommandCall().notRecursing());
+        }
+
+        public void willBuildOneCommandWhenOnlySkipTestsSwitchIsSpecified() {
+            assertCommands(builder.parseCommand("-S"), aCommandCall().skippingTests());
+        }
+
+        public void willBuildOneCommandWhenOnlyProfileSwitchIsSpecified() {
+            assertCommands(builder.parseCommand("-Pprofile"),
+                    aCommandCall().hasProfiles("profile"));
+        }
+
+        public void willBuildOneCommandWhenOnlyPropertySwitchIsSpecified() {
+            assertCommands(builder.parseCommand("-Dabcd=def"),
+                    aCommandCall().hasProperties("abcd=def"));
+        }
+
+        public void willBuildTwoCommandsWhenTwoPropertiesAreSpecified() {
+            assertCommands(builder.parseCommand("-Dabcd=def -Ddefg=ghi"),
+                    aCommandCall().hasProperties("abcd=def"),
+                    aCommandCall().hasProperties("defg=ghi"));
+        }
+
+        public void willBuildTwoCommandsWhenTwoSwitchesAreSpecified() {
+            assertCommands(builder.parseCommand("-Dabcd=def -o"),
+                    aCommandCall().hasProperties("abcd=def"),
+                    aCommandCall().runsOffline());
+        }
+    }
+
+    private void assertCommands(List<CommandCall> actual,
+            CommandCallTestDataBuilder... expected) {
         specify(actual.size(), should.equal(expected.length));
 
         for (int i = 0; i < actual.size(); i++) {
-            assertReflectionEquals(expected[i], actual.get(i));
+            assertReflectionEquals(expected[i].build(), actual.get(i));
         }
     }
 }

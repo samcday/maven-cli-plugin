@@ -140,15 +140,15 @@ class CommandCallBuilder {
 
     private void addProperty(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String property) {
-        if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
-            commands.add(currentCommandCall);
-        }
         // must have characters after -D
         if (property.length() < 3) {
             return;
         }
 
+        if (currentCommandCall == null) {
+            currentCommandCall = new CommandCall();
+            commands.add(currentCommandCall);
+        }
         property = property.substring(2);
         String key = property;
         String value = "1";

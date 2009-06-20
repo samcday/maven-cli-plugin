@@ -79,6 +79,10 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
                     aCommandCall().hasProperties("abcd=def"),
                     aCommandCall().runsOffline());
         }
+
+        public void willBuildNothingWhenNoKeyValueSpecifiedAfterPropertySwitch() {
+            specify(builder.parseCommand("-D").size(), should.equal(0));
+        }
     }
 
     private void assertCommands(List<CommandCall> actual,

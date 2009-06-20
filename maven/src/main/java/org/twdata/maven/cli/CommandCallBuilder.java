@@ -140,8 +140,7 @@ class CommandCallBuilder {
 
     private void addProperty(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String property) {
-        // must have characters after -D
-        if (property.length() < 3 || !property.contains("=")) {
+        if (property.length() < 3 || hasNoKeyValue(property)) {
             return;
         }
 
@@ -160,5 +159,10 @@ class CommandCallBuilder {
             }
         }
         currentCommandCall.getProperties().put(key, value);
+    }
+
+    private boolean hasNoKeyValue(String property) {
+        return property.charAt(2) == '=' || !property.contains("=")
+                || property.endsWith("=");
     }
 }

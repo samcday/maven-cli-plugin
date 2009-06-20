@@ -87,6 +87,14 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
         public void willBuildNothingWhenNoValueIsSpecifiedAfterPropertySwitch() {
             specify(builder.parseCommand("-Dabc").size(), should.equal(0));
         }
+
+        public void willBuildNothingWhenNoValueIsSpecifiedAfterPropertySwitchWithEqualSign() {
+            specify(builder.parseCommand("-Dabc=").size(), should.equal(0));
+        }
+
+        public void willBuildNothingWhenNoKeyIsSpecifiedAfterPropertySwitch() {
+            specify(builder.parseCommand("-D=def").size(), should.equal(0));
+        }
     }
 
     private void assertCommands(List<CommandCall> actual,

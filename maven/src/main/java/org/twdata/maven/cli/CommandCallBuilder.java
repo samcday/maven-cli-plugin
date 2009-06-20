@@ -141,7 +141,7 @@ class CommandCallBuilder {
     private void addProperty(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String property) {
         // must have characters after -D
-        if (property.length() < 3) {
+        if (property.length() < 3 || !property.contains("=")) {
             return;
         }
 

@@ -131,6 +131,15 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
 
             specify(builder.parseCommand("sub*").size(), should.equal(0));
         }
+
+        public void willBuildCommandWithPhasesSpecifiedAfterTheModuleName() {
+            MavenProject submodule = new MavenProject();
+            modules.put("mod1", submodule);
+
+            assertCommands(builder.parseCommand("clean mod1 test"),
+                    aCommandCall().hasProjects(defaultProject).hasPhases("clean"),
+                    aCommandCall().hasProjects(submodule).hasPhases("test"));
+        }
     }
 
     public class WhenUserAliasesAreSpecified {

@@ -165,8 +165,8 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
                     aCommandCall().hasProfiles("profile"));
         }
 
-        public void willAlsoBuildCommandEvenIfProfileIsSpecifiedAfterTheSwitch() {
-            specify(builder.parseCommand("-P").size(), should.equal(1));
+        public void shouldNotBuildCommandIfProfileIsNotSpecifiedAfterTheSwitch() {
+            specify(builder.parseCommand("-P").size(), should.equal(0));
         }
     }
 

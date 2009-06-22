@@ -112,13 +112,13 @@ class CommandCallBuilder {
 
     private void addProfile(List<CommandCall> commands,
                                     CommandCall currentCommandCall, String profile) {
+        if (profile.length() < 3) {
+            return;
+        }
+
         if (currentCommandCall == null) {
             currentCommandCall = new CommandCall();
             commands.add(currentCommandCall);
-        }
-        // must have characters after -P
-        if (profile.length() < 3) {
-            return;
         }
 
         profile = profile.substring(2);

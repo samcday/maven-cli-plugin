@@ -97,6 +97,52 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
         }
     }
 
+    public class WhenSpecifyingModules {
+        public void willBuildCommandWithNoValidLifecyleToRunIfInputHasNoPhasesSpecified() {
+            MavenProject submodule = new MavenProject();
+            modules.put("module", submodule);
+
+            assertCommands(builder.parseCommand("module"),
+                    aCommandCall().hasProjects(submodule));
+        }
+
+        public void willBuildCommandWithModulesMatchingTheWildCardSpecified() {
+            MavenProject submodule1 = new MavenProject();
+            MavenProject submodule2 = new MavenProject();
+
+            modules.put("submodule1", submodule1);
+            modules.put("submodule2", submodule1);
+            modules.put("module", new MavenProject());
+
+            assertCommands(builder.parseCommand("sub*"),
+                    aCommandCall().hasProjects(submodule1, submodule2));
+        }
+
+        public void willNotBuildCommandIfWildCardSpecifiedMatchesNothing() {
+            modules.put("mod1", new MavenProject());
+            modules.put("mod2", new MavenProject());
+
+            specify(builder.parseCommand("sub*").size(), should.equal(0));
+        }
+    }
+
+    public class WhenUserAliasesAreSpecified {
+        public void willExpandAliasAsDefinedInPom() {
+            userAliases.put("explode", "clean compile");
+
+            assertCommands(builder.parseCommand("explode"),
+                    aCommandCall().hasPhases("clean", "compile").hasProjects(defaultProject));
+        }
+
+        public void willJoinTheUsualParsingAfterExpandingTheAlias() {
+            userAliases.put("explode", "clean compile");
+
+            assertCommands(builder.parseCommand("explode -N test"),
+                    aCommandCall().hasPhases("clean", "compile", "test")
+                        .hasProjects(defaultProject).notRecursing());
+        }
+    }
+
     private void assertCommands(List<CommandCall> actual,
             CommandCallTestDataBuilder... expected) {
         specify(actual.size(), should.equal(expected.length));

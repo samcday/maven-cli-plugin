@@ -159,6 +159,17 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
         }
     }
 
+    public class WhenProfileSwitchIsSpecified {
+        public void willBuildCommandEvenIfNoPhasesIsSpecified() {
+            assertCommands(builder.parseCommand("-Pprofile"),
+                    aCommandCall().hasProfiles("profile"));
+        }
+
+        public void willAlsoBuildCommandEvenIfProfileIsSpecifiedAfterTheSwitch() {
+            specify(builder.parseCommand("-P").size(), should.equal(1));
+        }
+    }
+
     private void assertCommands(List<CommandCall> actual,
             CommandCallTestDataBuilder... expected) {
         specify(actual.size(), should.equal(expected.length));

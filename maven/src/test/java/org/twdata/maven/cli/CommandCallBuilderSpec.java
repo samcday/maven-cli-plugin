@@ -18,6 +18,13 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
     private CommandCallBuilder builder =
             new CommandCallBuilder(defaultProject, modules, userAliases);
 
+    public class WhenInputtingWithExtraSpaces {
+        public void willRemoveSpacesInParsing() {
+            assertCommands(builder.parseCommand("clean  -o  test"),
+                    aCommandCall().hasPhases("clean", "test").runsOffline().hasProjects(defaultProject));
+        }
+    }
+
     public class WhenInputOnlyContainsPhases {
         public void shouldBuildOnlyOneCommandContainingAllThePhases() {
             assertCommands(builder.parseCommand("clean test"),
@@ -140,6 +147,15 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
             assertCommands(builder.parseCommand("explode -N test"),
                     aCommandCall().hasPhases("clean", "compile", "test")
                         .hasProjects(defaultProject).notRecursing());
+        }
+
+        public void willResolveEmbeddedAliases() {
+            userAliases.put("explode", "clean compile");
+            userAliases.put("clean-test", "explode test");
+
+            assertCommands(builder.parseCommand("clean-test"),
+                    aCommandCall().hasPhases("clean", "compile", "test")
+                    .hasProjects(defaultProject));
         }
     }
 

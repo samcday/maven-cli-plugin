@@ -57,30 +57,17 @@ class CommandCallBuilder {
     }
 
     private List<String> resolveUserAliases(String text) {
-        List<String> tokens = new ArrayList<String>(Arrays.asList(text.split(" ")));
+        List<String> result = new ArrayList<String>();
 
-        int i = 0;
-        while (i < tokens.size()) {
-            String token = tokens.get(i);
-            if (StringUtils.isEmpty(token)) {
-                tokens.remove(i);
-                continue;
-            } else if (userAliases.containsKey(token)) {
-                String alias = userAliases.get(token);
-                List<String> aliasTokens = new ArrayList<String>(Arrays.asList(alias.split(" ")));
-                tokens.remove(i);
-                for (Iterator<String> aliasIter = aliasTokens.iterator(); aliasIter.hasNext();) {
-                    if (StringUtils.isEmpty(aliasIter.next())) {
-                        aliasIter.remove();
-                    }
-                }
-                tokens.addAll(i, aliasTokens);
-            } else {
-                i++;
+        for (String token : text.split(" ")) {
+            if (userAliases.containsKey(token)) {
+                result.addAll(resolveUserAliases(userAliases.get(token)));
+            } else if (!StringUtils.isEmpty(token)) {
+                result.add(token);
             }
         }
 
-        return tokens;
+        return result;
     }
 
     private CommandCall addProject(List<CommandCall> commands,

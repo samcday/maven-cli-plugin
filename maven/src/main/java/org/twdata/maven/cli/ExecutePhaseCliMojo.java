@@ -109,10 +109,16 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
 
     protected Map<String, MavenProject> modules;
 
+    private CommandCallBuilder commandCallBuilder;
+    private CommandCallRunner runner;
+
     public void execute() throws MojoExecutionException {
         resolveModulesInProject();
         resolveUserAliases();
         List<String> availableCommands = buildAvailableCommands();
+        commandCallBuilder = new CommandCallBuilder(project, modules, userAliases);
+        runner = new CommandCallRunner(session, project, getLog());
+
         startListeningForCommands(availableCommands);
     }
 
@@ -149,10 +155,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
     }
 
     public void interpretCommand(String command) throws MojoExecutionException {
-        CommandCallBuilder commandCallBuilder =
-                new CommandCallBuilder(project, modules, userAliases);
-        CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
-
         if (listCommands.contains(command)) {
             listReactorProjects();
         } else {

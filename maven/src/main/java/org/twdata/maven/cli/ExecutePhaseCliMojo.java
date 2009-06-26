@@ -1,5 +1,6 @@
 package org.twdata.maven.cli;
 
+import org.twdata.maven.cli.externalapi.JLineCliConsole;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,14 @@ import org.apache.maven.project.MavenProject;
  * @goal execute-phase
  */
 public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpreter {
+    private final List<String> exitCommands = Collections
+            .unmodifiableList(new ArrayList<String>() {
+                {
+                    add("quit");
+                    add("exit");
+                    add("bye");
+                }
+            });
 
     private final List<String> defaultPhases = Collections
             .unmodifiableList(new ArrayList<String>() {
@@ -143,15 +152,18 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
         availableCommands.addAll(listCommands);
         availableCommands.addAll(modules.keySet());
         availableCommands.addAll(defaultProperties);
+        availableCommands.addAll(exitCommands);
 
         return availableCommands;
     }
 
     private void startListeningForCommands(List<String> availableCommands)
             throws MojoExecutionException {
-        CommandReader reader = new CommandReader(availableCommands, prompt);
+        CommandsCompletor completor = new CommandsCompletor(availableCommands);
+        JLineCliConsole reader = new JLineCliConsole(System.in, System.out, completor,
+                prompt);
         getLog().info("Waiting for commands");
-        reader.startListening(this);
+        reader.startConsole(this);
     }
 
     public void interpretCommand(String command) throws MojoExecutionException {

@@ -1,6 +1,6 @@
 package org.twdata.maven.cli;
 
-import org.twdata.maven.cli.externalapi.JLineCliConsole;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +12,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.externalapi.JLineCliConsole;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing
@@ -159,19 +161,38 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
 
     private void startListeningForCommands(List<String> availableCommands)
             throws MojoExecutionException {
-        CommandsCompletor completor = new CommandsCompletor(availableCommands);
-        JLineCliConsole reader = new JLineCliConsole(System.in, System.out, completor,
-                prompt);
-        getLog().info("Waiting for commands");
-        reader.startConsole(this);
+        try {
+            CommandsCompletor completor = new CommandsCompletor(availableCommands);
+            CliConsole cliConsole = new JLineCliConsole(System.in, System.out,
+                    completor, prompt);
+            String line;
+
+            getLog().info("Waiting for commands");
+            while ((line = cliConsole.readLine()) != null) {
+                if (StringUtils.isEmpty(line)) {
+                    continue;
+                } else if (interpretCommand(line) == false) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException("Unable to execute cli commands",
+                    e);
+        }
     }
 
-    public void interpretCommand(String command) throws MojoExecutionException {
+    public boolean interpretCommand(String command) throws MojoExecutionException {
+        if (exitCommands.contains(command)) {
+            return false;
+        }
+
         if (listCommands.contains(command)) {
             listReactorProjects();
         } else {
             executeLifeCyclePhases(commandCallBuilder, runner, command);
         }
+
+        return true;
     }
 
     private void listReactorProjects() {

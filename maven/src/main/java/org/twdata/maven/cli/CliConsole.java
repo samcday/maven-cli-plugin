@@ -1,7 +1,7 @@
 package org.twdata.maven.cli;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import java.io.IOException;
 
 public interface CliConsole {
-    void startConsole(CommandInterpreter interpreter) throws MojoExecutionException;
+    String readLine() throws IOException;
 }

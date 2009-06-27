@@ -74,7 +74,7 @@ public class ExecutePhaseCommand implements Command {
             for (PhaseCall call : calls) {
                 console.writeDebug("Executing: " + call);
                 long start = System.currentTimeMillis();
-                runner.executeCommand(call);
+                call.run(runner);
                 long now = System.currentTimeMillis();
                 console.writeInfo("Execution time: " + (now - start) + " ms");
             }

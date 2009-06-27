@@ -8,10 +8,10 @@ import jdave.junit4.JDaveRunner;
 import org.apache.maven.project.MavenProject;
 import org.junit.runner.RunWith;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
-import static org.twdata.maven.cli.CommandCallTestDataBuilder.aCommandCall;
+import static org.twdata.maven.cli.PhaseCallTestDataBuilder.aPhaseCall;
 
 @RunWith(JDaveRunner.class)
-public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
+public class PhaseCallBuilderSpec extends Specification<PhaseCallBuilder> {
     private MavenProject defaultProject = new MavenProject();
     private Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     private Map<String, String> userAliases = new HashMap<String, String>();
@@ -20,71 +20,70 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
 
     public class WhenInputtingWithExtraSpaces {
         public void willRemoveSpacesInParsing() {
-            assertCommands(builder.parseCommand("clean  -o  test"),
-                    aCommandCall().hasPhases("clean", "test").runsOffline().hasProjects(defaultProject));
+            assertPhaseCalls(builder.parseCommand("clean  -o  test"),
+                    aPhaseCall().hasPhases("clean", "test").runsOffline().hasProjects(defaultProject));
         }
     }
 
     public class WhenInputOnlyContainsPhases {
         public void shouldBuildOnlyOneCommandContainingAllThePhases() {
-            assertCommands(builder.parseCommand("clean test"),
-                    aCommandCall().hasPhases("clean", "test").hasProjects(defaultProject));
+            assertPhaseCalls(builder.parseCommand("clean test"),
+                    aPhaseCall().hasPhases("clean", "test").hasProjects(defaultProject));
         }
     }
 
     public class WhenInputContainsPhasesAndOfflineSwitch {
         public void shouldBuildOnlyOneCommandWhenSwitchIsSpecifiedAfterPhases() {
-            assertCommands(builder.parseCommand("clean test -o"),
-                    aCommandCall().hasPhases("clean", "test").runsOffline()
+            assertPhaseCalls(builder.parseCommand("clean test -o"),
+                    aPhaseCall().hasPhases("clean", "test").runsOffline()
                             .hasProjects(defaultProject));
         }
 
         public void shouldBuildTwoCommandWhenSwitchIsSpecifiedBeforePhases() {
-            assertCommands(builder.parseCommand("-o clean test"),
-                    aCommandCall().runsOffline(),
-                    aCommandCall().hasPhases("clean", "test").hasProjects(defaultProject));
+            assertPhaseCalls(builder.parseCommand("-o clean test"),
+                    aPhaseCall().runsOffline(),
+                    aPhaseCall().hasPhases("clean", "test").hasProjects(defaultProject));
         }
 
         public void shouldBuildOneCommandEvenWhenSwitchIsSpecifiedBetweenPhases() {
-            assertCommands(builder.parseCommand("clean -o test"),
-                    aCommandCall().hasPhases("clean", "test").runsOffline()
+            assertPhaseCalls(builder.parseCommand("clean -o test"),
+                    aPhaseCall().hasPhases("clean", "test").runsOffline()
                             .hasProjects(defaultProject));
         }
     }
 
     public class WhenOnlySwitchesAreSpecified {
         public void willBuildOneCommandWhenOnlyOfflineSwitchIsSpecified() {
-            assertCommands(builder.parseCommand("-o"), aCommandCall().runsOffline());
+            assertPhaseCalls(builder.parseCommand("-o"), aPhaseCall().runsOffline());
         }
 
         public void willBuildOneCommandWhenOnlyDoNotRecurseSwitchIsSpecified() {
-            assertCommands(builder.parseCommand("-N"), aCommandCall().notRecursing());
+            assertPhaseCalls(builder.parseCommand("-N"), aPhaseCall().notRecursing());
         }
 
         public void willBuildOneCommandWhenOnlySkipTestsSwitchIsSpecified() {
-            assertCommands(builder.parseCommand("-S"), aCommandCall().skippingTests());
+            assertPhaseCalls(builder.parseCommand("-S"), aPhaseCall().skippingTests());
         }
 
         public void willBuildOneCommandWhenOnlyProfileSwitchIsSpecified() {
-            assertCommands(builder.parseCommand("-Pprofile"),
-                    aCommandCall().hasProfiles("profile"));
+            assertPhaseCalls(builder.parseCommand("-Pprofile"), aPhaseCall().hasProfiles("profile"));
         }
 
         public void willBuildOneCommandWhenOnlyPropertySwitchIsSpecified() {
-            assertCommands(builder.parseCommand("-Dabcd=def"),
-                    aCommandCall().hasProperties("abcd=def"));
+            assertPhaseCalls(builder.parseCommand("-Dabcd=def"),
+                    aPhaseCall().hasProperties("abcd=def"));
         }
 
         public void willBuildTwoCommandsWhenTwoPropertiesAreSpecified() {
-            assertCommands(builder.parseCommand("-Dabcd=def -Ddefg=ghi"),
-                    aCommandCall().hasProperties("abcd=def"),
-                    aCommandCall().hasProperties("defg=ghi"));
+            assertPhaseCalls(builder.parseCommand("-Dabcd=def -Ddefg=ghi"),
+                    aPhaseCall().hasProperties("abcd=def"),
+                    aPhaseCall().hasProperties("defg=ghi"));
         }
 
         public void willBuildTwoCommandsWhenTwoSwitchesAreSpecified() {
-            assertCommands(builder.parseCommand("-Dabcd=def -o"),
-                    aCommandCall().hasProperties("abcd=def"),
-                    aCommandCall().runsOffline());
+            assertPhaseCalls(builder.parseCommand("-Dabcd=def -o"),
+                    aPhaseCall().hasProperties("abcd=def"),
+                    aPhaseCall().runsOffline());
         }
 
         public void willBuildNothingWhenNoKeyValueSpecifiedAfterPropertySwitch() {
@@ -109,8 +108,7 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
             MavenProject submodule = new MavenProject();
             modules.put("module", submodule);
 
-            assertCommands(builder.parseCommand("module"),
-                    aCommandCall().hasProjects(submodule));
+            assertPhaseCalls(builder.parseCommand("module"), aPhaseCall().hasProjects(submodule));
         }
 
         public void willBuildCommandWithModulesMatchingTheWildCardSpecified() {
@@ -121,8 +119,8 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
             modules.put("submodule2", submodule1);
             modules.put("module", new MavenProject());
 
-            assertCommands(builder.parseCommand("sub*"),
-                    aCommandCall().hasProjects(submodule1, submodule2));
+            assertPhaseCalls(builder.parseCommand("sub*"),
+                    aPhaseCall().hasProjects(submodule1, submodule2));
         }
 
         public void willNotBuildCommandIfWildCardSpecifiedMatchesNothing() {
@@ -136,9 +134,9 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
             MavenProject submodule = new MavenProject();
             modules.put("mod1", submodule);
 
-            assertCommands(builder.parseCommand("clean mod1 test"),
-                    aCommandCall().hasProjects(defaultProject).hasPhases("clean"),
-                    aCommandCall().hasProjects(submodule).hasPhases("test"));
+            assertPhaseCalls(builder.parseCommand("clean mod1 test"),
+                    aPhaseCall().hasProjects(defaultProject).hasPhases("clean"),
+                    aPhaseCall().hasProjects(submodule).hasPhases("test"));
         }
     }
 
@@ -146,32 +144,30 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
         public void willExpandAliasAsDefinedInPom() {
             userAliases.put("explode", "clean compile");
 
-            assertCommands(builder.parseCommand("explode"),
-                    aCommandCall().hasPhases("clean", "compile").hasProjects(defaultProject));
+            assertPhaseCalls(builder.parseCommand("explode"),
+                    aPhaseCall().hasPhases("clean", "compile").hasProjects(defaultProject));
         }
 
         public void willJoinTheUsualParsingAfterExpandingTheAlias() {
             userAliases.put("explode", "clean compile");
 
-            assertCommands(builder.parseCommand("explode -N test"),
-                    aCommandCall().hasPhases("clean", "compile", "test")
-                        .hasProjects(defaultProject).notRecursing());
+            assertPhaseCalls(builder.parseCommand("explode -N test"),
+                    aPhaseCall().hasPhases("clean", "compile", "test").hasProjects(defaultProject)
+                        .notRecursing());
         }
 
         public void willResolveEmbeddedAliases() {
             userAliases.put("explode", "clean compile");
             userAliases.put("clean-test", "explode test");
 
-            assertCommands(builder.parseCommand("clean-test"),
-                    aCommandCall().hasPhases("clean", "compile", "test")
-                    .hasProjects(defaultProject));
+            assertPhaseCalls(builder.parseCommand("clean-test"),
+                    aPhaseCall().hasPhases("clean", "compile", "test").hasProjects(defaultProject));
         }
     }
 
     public class WhenProfileSwitchIsSpecified {
         public void willBuildCommandEvenIfNoPhasesIsSpecified() {
-            assertCommands(builder.parseCommand("-Pprofile"),
-                    aCommandCall().hasProfiles("profile"));
+            assertPhaseCalls(builder.parseCommand("-Pprofile"), aPhaseCall().hasProfiles("profile"));
         }
 
         public void shouldNotBuildCommandIfProfileIsNotSpecifiedAfterTheSwitch() {
@@ -179,8 +175,8 @@ public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
         }
     }
 
-    private void assertCommands(List<PhaseCall> actual,
-            CommandCallTestDataBuilder... expected) {
+    private void assertPhaseCalls(List<PhaseCall> actual,
+            PhaseCallTestDataBuilder... expected) {
         specify(actual.size(), should.equal(expected.length));
 
         for (int i = 0; i < actual.size(); i++) {

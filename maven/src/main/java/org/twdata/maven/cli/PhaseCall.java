@@ -5,17 +5,13 @@ import java.util.List;
 import java.util.Properties;
 import org.apache.maven.project.MavenProject;
 
-class PhaseCall {
+public class PhaseCall {
     private final List<String> phases = new ArrayList<String>();
     private final List<String> profiles = new ArrayList<String>();
     private final List<MavenProject> projects = new ArrayList<MavenProject>();
     private final Properties properties = new Properties();
     private boolean offline = false;
     private boolean recursive = true;
-
-    public List<MavenProject> getProjects() {
-        return projects;
-    }
 
     public void addProject(MavenProject project) {
         projects.add(project);
@@ -59,6 +55,12 @@ class PhaseCall {
 
     public void doNotRecurse() {
         recursive = false;
+    }
+
+    public void run(PhaseCallRunner runner) {
+        for (MavenProject project : projects) {
+            runner.run(project, this);
+        }
     }
 
     @Override

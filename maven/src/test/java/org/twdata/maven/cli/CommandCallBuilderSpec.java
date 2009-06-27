@@ -11,12 +11,12 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 import static org.twdata.maven.cli.CommandCallTestDataBuilder.aCommandCall;
 
 @RunWith(JDaveRunner.class)
-public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
+public class CommandCallBuilderSpec extends Specification<PhaseCallBuilder> {
     private MavenProject defaultProject = new MavenProject();
     private Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     private Map<String, String> userAliases = new HashMap<String, String>();
-    private CommandCallBuilder builder =
-            new CommandCallBuilder(defaultProject, modules, userAliases);
+    private PhaseCallBuilder builder =
+            new PhaseCallBuilder(defaultProject, modules, userAliases);
 
     public class WhenInputtingWithExtraSpaces {
         public void willRemoveSpacesInParsing() {

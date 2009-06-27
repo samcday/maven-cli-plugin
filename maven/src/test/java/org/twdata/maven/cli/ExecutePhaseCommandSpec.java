@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 public class ExecutePhaseCommandSpec extends Specification<Void> {
     public class WhenRunningRequests {
         private Set<String> modules = new HashSet<String>();
-        private CommandCallBuilder mockBuilder = mock(CommandCallBuilder.class);
+        private PhaseCallBuilder mockBuilder = mock(PhaseCallBuilder.class);
         private CommandCallRunner mockRunner = mock(CommandCallRunner.class);
         private CliConsole mockConsole = mock(CliConsole.class);
         private ExecutePhaseCommand command =

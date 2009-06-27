@@ -17,16 +17,32 @@ class PhaseCall {
         return projects;
     }
 
+    public void addProject(MavenProject project) {
+        projects.add(project);
+    }
+
     public List<String> getPhases() {
         return phases;
+    }
+
+    public void addPhase(String phase) {
+        phases.add(phase);
     }
 
     public List<String> getProfiles() {
         return profiles;
     }
 
+    public void addProfile(String profile) {
+        profiles.add(profile);
+    }
+
     public Properties getProperties() {
         return properties;
+    }
+
+    public void addProperty(String property, String value) {
+        properties.put(property, value);
     }
 
     public boolean isOffline() {

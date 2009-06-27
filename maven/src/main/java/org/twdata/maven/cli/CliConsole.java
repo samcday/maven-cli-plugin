@@ -1,7 +1,8 @@
 package org.twdata.maven.cli;
 
-import java.io.IOException;
-
 public interface CliConsole {
-    String readLine() throws IOException;
+    String readLine();
+    void writeInfo(String info);
+    void writeError(String error);
+    void writeDebug(String debug);
 }

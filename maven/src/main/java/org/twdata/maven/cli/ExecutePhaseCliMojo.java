@@ -1,8 +1,6 @@
 package org.twdata.maven.cli;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,52 +22,6 @@ import org.twdata.maven.cli.externalapi.JLineCliConsole;
  * @goal execute-phase
  */
 public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpreter {
-    private final List<String> exitCommands = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("quit");
-                    add("exit");
-                    add("bye");
-                }
-            });
-
-    private final List<String> defaultPhases = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("clean");
-
-                    add("validate");
-                    add("generate-sources");
-                    add("generate-resources");
-                    add("test-compile");
-                    add("test");
-                    add("package");
-                    add("integration-test");
-                    add("install");
-                    add("deploy");
-
-                    add("site");
-                    add("site-deploy");
-                }
-            });
-
-    private final List<String> defaultProperties = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("-o"); // offline mode
-                    add("-N"); // don't recurse
-                    add("-S"); // skip tests
-                }
-            });
-
-    private final List<String> listCommands = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("list");
-                    add("ls");
-                }
-            });
-
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
      *
@@ -120,17 +72,19 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
 
     protected Map<String, MavenProject> modules;
 
-    private CommandCallBuilder commandCallBuilder;
-    private CommandCallRunner runner;
+    private List<Command> commands = new ArrayList<Command>();
+    private CliConsole console;
 
     public void execute() throws MojoExecutionException {
         resolveModulesInProject();
         resolveUserAliases();
-        List<String> availableCommands = buildAvailableCommands();
-        commandCallBuilder = new CommandCallBuilder(project, modules, userAliases);
-        runner = new CommandCallRunner(session, project, getLog());
+        console = new JLineCliConsole(System.in, System.out, getLog(), prompt);
 
-        startListeningForCommands(availableCommands);
+        buildCommands();
+        List<String> validCommandTokens = buildValidCommandTokens();
+
+        ((JLineCliConsole) console).setCompletor(new CommandsCompletor(validCommandTokens));
+        startListeningForCommands();
     }
 
     private void resolveModulesInProject() {
@@ -145,79 +99,63 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
         if (userAliases == null) {
             userAliases = new HashMap<String, String>();
         }
+
+        compactWhiteSpacesInUserAliases();
     }
 
-    private List<String> buildAvailableCommands() {
+    private void buildCommands() throws MojoExecutionException {
+        commands.add(new ExitCommand());
+        commands.add(new ListProjectsCommand(modules.keySet(), console));
+
+        CommandCallBuilder commandCallBuilder = new CommandCallBuilder(project, modules, userAliases);
+        CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
+
+        commands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner, console));
+    }
+
+    private List<String> buildValidCommandTokens() {
         List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(defaultPhases);
         availableCommands.addAll(userAliases.keySet());
-        availableCommands.addAll(listCommands);
         availableCommands.addAll(modules.keySet());
-        availableCommands.addAll(defaultProperties);
-        availableCommands.addAll(exitCommands);
+
+        for (Command command : commands) {
+            availableCommands.addAll(command.getCommandNames());
+        }
 
         return availableCommands;
     }
 
-    private void startListeningForCommands(List<String> availableCommands)
-            throws MojoExecutionException {
+    private void startListeningForCommands() throws MojoExecutionException {
         try {
-            CommandsCompletor completor = new CommandsCompletor(availableCommands);
-            CliConsole cliConsole = new JLineCliConsole(System.in, System.out,
-                    completor, prompt);
             String line;
 
             getLog().info("Waiting for commands");
-            while ((line = cliConsole.readLine()) != null) {
+            while ((line = console.readLine()) != null) {
                 if (StringUtils.isEmpty(line)) {
                     continue;
-                } else if (interpretCommand(line) == false) {
+                } else if (interpretCommand(line.replaceAll(" {2,}", " ")) == false) {
                     break;
                 }
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to execute cli commands",
-                    e);
+        } catch (Exception e) {
+            throw new MojoExecutionException("Unable to execute cli commands", e);
         }
     }
 
-    public boolean interpretCommand(String command) throws MojoExecutionException {
-        if (exitCommands.contains(command)) {
-            return false;
+    private void compactWhiteSpacesInUserAliases() {
+        for (String key : userAliases.keySet()) {
+            String value = userAliases.get(key).replaceAll("\\s{2,}", " ");
+            userAliases.put(key, value);
         }
+    }
 
-        if (listCommands.contains(command)) {
-            listReactorProjects();
-        } else {
-            executeLifeCyclePhases(commandCallBuilder, runner, command);
+    public boolean interpretCommand(String request) throws MojoExecutionException {
+        for (Command cmd : commands) {
+            if (cmd.matchesRequest(request)) {
+                return cmd.run(request);
+            }
         }
 
         return true;
-    }
-
-    private void listReactorProjects() {
-        getLog().info("Listing available projects: ");
-        for (Object reactorProject : reactorProjects) {
-            getLog().info("* " + ((MavenProject) reactorProject).getArtifactId());
-        }
-    }
-
-    private void executeLifeCyclePhases(CommandCallBuilder commandCallBuilder,
-            CommandCallRunner runner, String line) {
-        List<CommandCall> calls = new ArrayList<CommandCall>();
-        try {
-            calls = commandCallBuilder.parseCommand(line);
-        } catch (IllegalArgumentException ex) {
-            getLog().error("Invalid command: " + line);
-            return;
-        }
-
-        for (CommandCall call : calls) {
-            getLog().debug("Executing: " + call);
-            long start = System.currentTimeMillis();
-            runner.executeCommand(call);
-            long now = System.currentTimeMillis();
-            getLog().info("Execution time: " + (now - start) + " ms");
-        }
     }
 }

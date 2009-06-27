@@ -11,7 +11,7 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
     public class WhenRunningRequests {
         private Set<String> modules = new HashSet<String>();
         private PhaseCallBuilder mockBuilder = mock(PhaseCallBuilder.class);
-        private CommandCallRunner mockRunner = mock(CommandCallRunner.class);
+        private PhaseCallRunner mockRunner = mock(PhaseCallRunner.class);
         private CliConsole mockConsole = mock(CliConsole.class);
         private ExecutePhaseCommand command =
                 new ExecutePhaseCommand(modules, mockBuilder, mockRunner, mockConsole);

@@ -108,7 +108,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
         commands.add(new ListProjectsCommand(modules.keySet(), console));
 
         PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
-        CommandCallRunner runner = new CommandCallRunner(session, project, getLog());
+        PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
 
         commands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner, console));
     }

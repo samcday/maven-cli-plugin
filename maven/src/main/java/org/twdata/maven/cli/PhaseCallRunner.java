@@ -11,14 +11,14 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 
-class CommandCallRunner {
+class PhaseCallRunner {
     private final MavenSession session;
     private final MavenProject project;
     private final Log logger;
     private final File userDir;
     private boolean pluginExecutionOfflineMode;
 
-    public CommandCallRunner(MavenSession session, MavenProject project,
+    public PhaseCallRunner(MavenSession session, MavenProject project,
             Log logger) throws MojoExecutionException {
         this.session = session;
         this.project = project;

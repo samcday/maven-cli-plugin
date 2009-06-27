@@ -10,12 +10,12 @@ import java.util.TreeSet;
 public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;
     private final PhaseCallBuilder commandCallBuilder;
-    private final CommandCallRunner runner;
+    private final PhaseCallRunner runner;
     private final CliConsole console;
     private final SortedSet<String> phasesAndProperties;
 
     public ExecutePhaseCommand(Set<String> modules, PhaseCallBuilder commandCallBuilder,
-            CommandCallRunner runner, CliConsole console) {
+            PhaseCallRunner runner, CliConsole console) {
         this.modules = modules;
         this.commandCallBuilder = commandCallBuilder;
         this.runner = runner;

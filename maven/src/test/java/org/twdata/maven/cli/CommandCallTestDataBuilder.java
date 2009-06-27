@@ -3,17 +3,17 @@ package org.twdata.maven.cli;
 import org.apache.maven.project.MavenProject;
 
 public class CommandCallTestDataBuilder {
-    private CommandCall commandCall = new CommandCall();
+    private PhaseCall commandCall = new PhaseCall();
 
     public CommandCallTestDataBuilder hasPhases(String... phases) {
         for (String phase : phases) {
-            commandCall.getCommands().add(phase);
+            commandCall.getPhases().add(phase);
         }
 
         return this;
     }
 
-    public CommandCall build() {
+    public PhaseCall build() {
         return commandCall;
     }
 

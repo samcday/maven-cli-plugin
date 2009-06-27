@@ -19,9 +19,9 @@ class CommandCallBuilder {
         this.userAliases = userAliases;
     }
 
-    public List<CommandCall> parseCommand(String text) {
-        List<CommandCall> commands = new ArrayList<CommandCall>();
-        CommandCall currentCommandCall = null;
+    public List<PhaseCall> parseCommand(String text) {
+        List<PhaseCall> commands = new ArrayList<PhaseCall>();
+        PhaseCall currentCommandCall = null;
 
         for (String token : resolveUserAliases(text)) {
             if (modules.containsKey(token)) {
@@ -68,54 +68,54 @@ class CommandCallBuilder {
         return result;
     }
 
-    private CommandCall addProject(List<CommandCall> commands,
-                                   CommandCall currentCommandCall, MavenProject project) {
+    private PhaseCall addProject(List<PhaseCall> commands,
+                                   PhaseCall currentCommandCall, MavenProject project) {
         if (currentCommandCall == null
-                || !currentCommandCall.getCommands().isEmpty()) {
-            currentCommandCall = new CommandCall();
+                || !currentCommandCall.getPhases().isEmpty()) {
+            currentCommandCall = new PhaseCall();
             commands.add(currentCommandCall);
         }
         currentCommandCall.getProjects().add(project);
         return currentCommandCall;
     }
 
-    private CommandCall addCommand(List<CommandCall> commands,
-                                   CommandCall currentCommandCall, String command) {
+    private PhaseCall addCommand(List<PhaseCall> commands,
+                                   PhaseCall currentCommandCall, String command) {
         if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
+            currentCommandCall = new PhaseCall();
             currentCommandCall.getProjects().add(defaultProject);
             commands.add(currentCommandCall);
         }
-        currentCommandCall.getCommands().add(command);
+        currentCommandCall.getPhases().add(command);
         return currentCommandCall;
     }
 
-    private void disableRecursive(List<CommandCall> commands,
-                                    CommandCall currentCommandCall) {
+    private void disableRecursive(List<PhaseCall> commands,
+                                    PhaseCall currentCommandCall) {
         if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
+            currentCommandCall = new PhaseCall();
             commands.add(currentCommandCall);
         }
         currentCommandCall.doNotRecurse();
     }
 
-    private void goOffline(List<CommandCall> commands,
-                                    CommandCall currentCommandCall) {
+    private void goOffline(List<PhaseCall> commands,
+                                    PhaseCall currentCommandCall) {
         if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
+            currentCommandCall = new PhaseCall();
             commands.add(currentCommandCall);
         }
         currentCommandCall.goOffline();
     }
 
-    private void addProfile(List<CommandCall> commands,
-                                    CommandCall currentCommandCall, String profile) {
+    private void addProfile(List<PhaseCall> commands,
+                                    PhaseCall currentCommandCall, String profile) {
         if (profile.length() < 3) {
             return;
         }
 
         if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
+            currentCommandCall = new PhaseCall();
             commands.add(currentCommandCall);
         }
 
@@ -123,14 +123,14 @@ class CommandCallBuilder {
         currentCommandCall.getProfiles().add(profile);
     }
 
-    private void addProperty(List<CommandCall> commands,
-                                    CommandCall currentCommandCall, String property) {
+    private void addProperty(List<PhaseCall> commands,
+                                    PhaseCall currentCommandCall, String property) {
         if (property.length() < 3 || hasNoKeyValue(property)) {
             return;
         }
 
         if (currentCommandCall == null) {
-            currentCommandCall = new CommandCall();
+            currentCommandCall = new PhaseCall();
             commands.add(currentCommandCall);
         }
         property = property.substring(2);

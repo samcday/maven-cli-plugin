@@ -179,7 +179,7 @@ public class CommandCallBuilderSpec extends Specification<CommandCallBuilder> {
         }
     }
 
-    private void assertCommands(List<CommandCall> actual,
+    private void assertCommands(List<PhaseCall> actual,
             CommandCallTestDataBuilder... expected) {
         specify(actual.size(), should.equal(expected.length));
 

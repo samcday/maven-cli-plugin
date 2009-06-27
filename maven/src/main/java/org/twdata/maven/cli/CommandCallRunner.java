@@ -27,7 +27,7 @@ class CommandCallRunner {
         this.pluginExecutionOfflineMode = session.getSettings().isOffline();
     }
 
-    public void executeCommand(CommandCall commandCall) {
+    public void executeCommand(PhaseCall commandCall) {
         for (MavenProject currentProject : commandCall.getProjects()) {
             try {
                 // QUESTION: which should it be?
@@ -42,7 +42,7 @@ class CommandCallRunner {
                 MavenExecutionRequest request = new DefaultMavenExecutionRequest(
                         session.getLocalRepository(), session.getSettings(),
                         session.getEventDispatcher(),
-                        commandCall.getCommands(), userDir.getPath(),
+                        commandCall.getPhases(), userDir.getPath(),
                         profileManager, session.getExecutionProperties(),
                         project.getProperties(), true);
                 if (!commandCall.isRecursive()) {
@@ -54,7 +54,7 @@ class CommandCallRunner {
                 logger.info("Current project: " + project.getArtifactId());
             } catch (Exception e) {
                 logger.error(
-                        "Failed to execute '" + commandCall.getCommands()
+                        "Failed to execute '" + commandCall.getPhases()
                                 + "' on '" + currentProject.getArtifactId()
                                 + "'");
             }

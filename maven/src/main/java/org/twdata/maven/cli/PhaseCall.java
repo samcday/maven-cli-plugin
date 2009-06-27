@@ -1,40 +1,24 @@
 package org.twdata.maven.cli;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import org.apache.maven.project.MavenProject;
 
-
-class CommandCall {
-    private final List<String> commands;
-
-    private final List<String> profiles;
-
-    private final List<MavenProject> projects;
-
-    private final Properties properties;
-
-    private boolean offline;
-
-    private boolean recursive;
-
-    public CommandCall() {
-        commands = new ArrayList<String>();
-        profiles = new ArrayList<String>();
-        projects = new ArrayList<MavenProject>();
-        properties = new Properties();
-        recursive = true;
-        offline = false;
-    }
+class PhaseCall {
+    private final List<String> phases = new ArrayList<String>();
+    private final List<String> profiles = new ArrayList<String>();
+    private final List<MavenProject> projects = new ArrayList<MavenProject>();
+    private final Properties properties = new Properties();
+    private boolean offline = false;
+    private boolean recursive = true;
 
     public List<MavenProject> getProjects() {
         return projects;
     }
 
-    public List<String> getCommands() {
-        return commands;
+    public List<String> getPhases() {
+        return phases;
     }
 
     public List<String> getProfiles() {
@@ -67,14 +51,13 @@ class CommandCall {
         for (MavenProject project : projects) {
             sb.append("project: ").append(project.getArtifactId()).append(" ");
         }
-        for (String command : commands) {
-            sb.append("command: ").append(command).append(" ");
+        for (String phase : phases) {
+            sb.append("phase: ").append(phase).append(" ");
         }
         for (String profile : profiles) {
             sb.append("profile: ").append(profile).append(" ");
         }
-        for (Enumeration propNames = properties.propertyNames(); propNames.hasMoreElements();) {
-            String propName = (String) propNames.nextElement();
+        for (Object propName : properties.keySet()) {
             sb.append("property: ").append(propName).append("=").append(properties.get(propName)).append(" ");
         }
         return sb.toString();

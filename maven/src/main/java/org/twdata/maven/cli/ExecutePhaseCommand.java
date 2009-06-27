@@ -68,10 +68,10 @@ public class ExecutePhaseCommand implements Command {
 
     public boolean run(String request) {
         try {
-            List<CommandCall> calls = new ArrayList<CommandCall>();
+            List<PhaseCall> calls = new ArrayList<PhaseCall>();
             calls = commandCallBuilder.parseCommand(request);
 
-            for (CommandCall call : calls) {
+            for (PhaseCall call : calls) {
                 console.writeDebug("Executing: " + call);
                 long start = System.currentTimeMillis();
                 runner.executeCommand(call);

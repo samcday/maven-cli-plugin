@@ -24,6 +24,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.console.CliConsole;
+import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing

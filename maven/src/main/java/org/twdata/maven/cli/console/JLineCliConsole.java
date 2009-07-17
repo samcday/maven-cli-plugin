@@ -2,7 +2,7 @@ package org.twdata.maven.cli.console;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.OutputStreamWriter;
 import jline.Completor;
 import jline.ConsoleReader;
@@ -12,7 +12,7 @@ public class JLineCliConsole implements CliConsole {
     private final ConsoleReader consoleReader;
     private final Log logger;
 
-    public JLineCliConsole(InputStream in, OutputStream out, Log logger,
+    public JLineCliConsole(InputStream in, PrintStream out, Log logger,
             String prompt) {
         try {
             consoleReader = new ConsoleReader(in, new OutputStreamWriter(out));

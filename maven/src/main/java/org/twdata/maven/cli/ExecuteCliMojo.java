@@ -15,7 +15,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
@@ -220,19 +219,16 @@ public class ExecuteCliMojo extends AbstractMojo {
     }
 
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
-        // build a list of command aliases
         Map<String, String> goals = buildGoals();
-
-        // build list of commands available for completion
         List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
-
-        getLog().info("Waiting for commands");
         String defaultPrompt = (prompt != null ? prompt : "maven2") + "> ";
-        JLineCliConsole reader = new JLineCliConsole(in, out, getLog(), defaultPrompt);
-        reader.setCompletor(new CommandsCompletor(validCommandTokens));
+        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), defaultPrompt);
+        console.setCompletor(new CommandsCompletor(validCommandTokens));
+
+        console.writeInfo("Waiting for commands");
         String line;
 
-        while ((line = reader.readLine()) != null) {
+        while ((line = console.readLine()) != null) {
             if (StringUtils.isEmpty(line)) {
                 continue;
             } else {
@@ -240,12 +236,9 @@ public class ExecuteCliMojo extends AbstractMojo {
                     break;
                 } else {
                     if (listCommands.contains(line)) {
-                        getLog().info("Listing available projects: ");
+                        console.writeInfo("Listing available projects: ");
                         for (Object reactorProject : reactorProjects) {
-                            getLog().info(
-                                    "* "
-                                            + ((MavenProject) reactorProject)
-                                            .getArtifactId());
+                            console.writeInfo("* " + ((MavenProject) reactorProject).getArtifactId());
                         }
                     } else {
                         if (HELP_COMMAND.equals(line)) {
@@ -256,7 +249,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                                 parseCommand(line, goals, calls);
                             }
                             catch (IllegalArgumentException ex) {
-                                getLog().error("Invalid command: " + line);
+                                console.writeError("Invalid command: " + line);
                                 continue;
                             }
 
@@ -271,9 +264,8 @@ public class ExecuteCliMojo extends AbstractMojo {
                                             executionEnvironment(project, session,
                                                     pluginManager));
                                     long now = System.currentTimeMillis();
-                                    getLog().info("Current project: " + project.getArtifactId());
-                                    getLog().info(
-                                            "Execution time: " + (now - start) + " ms");
+                                    console.writeInfo("Current project: " + project.getArtifactId());
+                                    console.writeInfo("Execution time: " + (now - start) + " ms");
                                 }
                             }
                             catch (MojoExecutionException e) {
@@ -374,72 +366,6 @@ public class ExecuteCliMojo extends AbstractMojo {
                 }
                 commands.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
             }
-        }
-    }
-
-    private static class MojoCall {
-        private final String groupId;
-        private final String artifactId;
-        private final String goal;
-
-        public MojoCall(String groupId, String artifactId, String goal) {
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.goal = goal;
-        }
-
-        public String getGroupId() {
-            return groupId;
-        }
-
-        public String getArtifactId() {
-            return artifactId;
-        }
-
-        public String getGoal() {
-            return goal;
-        }
-
-        /**
-         * Tries to determine what version of the plugin has been already
-         * configured for this project. If unknown, "RELEASE" is used.
-         *
-         * @param project The maven project
-         * @return The discovered plugin version
-         */
-        public String getVersion(MavenProject project) {
-            String version = null;
-            List<Plugin> plugins = project.getBuildPlugins();
-            for (Plugin plugin : plugins) {
-                if (groupId.equals(plugin.getGroupId())
-                        && artifactId.equals(plugin.getArtifactId())) {
-                    version = plugin.getVersion();
-                    break;
-                }
-            }
-
-            if (version == null) {
-                plugins = project.getPluginManagement().getPlugins();
-                for (Plugin plugin : plugins) {
-                    if (groupId.equals(plugin.getGroupId())
-                            && artifactId.equals(plugin.getArtifactId())) {
-                        version = plugin.getVersion();
-                        break;
-                    }
-                }
-            }
-
-            if (version == null) {
-                version = "RELEASE";
-            }
-            return version;
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(groupId).append(":").append(artifactId);
-            sb.append(" [").append(goal).append("]");
-            return sb.toString();
         }
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.twdata.maven.cli.CliConsole;
+import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.PhaseCall;
 import org.twdata.maven.cli.PhaseCallRunner;
 

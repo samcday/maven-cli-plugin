@@ -1,4 +1,4 @@
-package org.twdata.maven.cli.externalapi;
+package org.twdata.maven.cli.console;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import jline.Completor;
 import jline.ConsoleReader;
 import org.apache.maven.plugin.logging.Log;
-import org.twdata.maven.cli.CliConsole;
 
 public class JLineCliConsole implements CliConsole {
     private final ConsoleReader consoleReader;

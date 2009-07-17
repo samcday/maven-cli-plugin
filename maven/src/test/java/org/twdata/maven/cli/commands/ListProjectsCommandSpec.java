@@ -5,7 +5,7 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
-import org.twdata.maven.cli.CliConsole;
+import org.twdata.maven.cli.console.CliConsole;
 
 @RunWith(JDaveRunner.class)
 public class ListProjectsCommandSpec extends Specification<Void> {

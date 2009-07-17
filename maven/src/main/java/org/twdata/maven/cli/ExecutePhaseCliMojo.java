@@ -1,5 +1,6 @@
 package org.twdata.maven.cli;
 
+import org.twdata.maven.cli.console.CliConsole;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
-import org.twdata.maven.cli.externalapi.JLineCliConsole;
+import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing

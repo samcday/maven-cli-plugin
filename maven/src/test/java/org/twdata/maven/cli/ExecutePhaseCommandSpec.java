@@ -7,6 +7,7 @@ import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
+import org.twdata.maven.cli.console.CliConsole;
 
 @RunWith(JDaveRunner.class)
 public class ExecutePhaseCommandSpec extends Specification<Void> {

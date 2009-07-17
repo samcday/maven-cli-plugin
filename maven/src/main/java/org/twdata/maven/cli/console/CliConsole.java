@@ -1,4 +1,4 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.console;
 
 public interface CliConsole {
     String readLine();

@@ -3,7 +3,7 @@ package org.twdata.maven.cli.commands;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.twdata.maven.cli.CliConsole;
+import org.twdata.maven.cli.console.CliConsole;
 
 public class ListProjectsCommand implements Command {
     private final Set<String> listCommands;

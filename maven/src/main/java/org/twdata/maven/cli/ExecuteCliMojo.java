@@ -13,9 +13,6 @@ import java.io.*;
 import java.util.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-
-import jline.ConsoleReader;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -24,7 +21,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
-import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
@@ -231,70 +227,63 @@ public class ExecuteCliMojo extends AbstractMojo {
         List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
 
         getLog().info("Waiting for commands");
-        try {
-            ConsoleReader reader = new ConsoleReader(in,
-                    new OutputStreamWriter(out));
-            reader.addCompletor(new CommandsCompletor(validCommandTokens));
-            reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
-            String line;
+        String defaultPrompt = (prompt != null ? prompt : "maven2") + "> ";
+        JLineCliConsole reader = new JLineCliConsole(in, out, getLog(), defaultPrompt);
+        reader.setCompletor(new CommandsCompletor(validCommandTokens));
+        String line;
 
-            while ((line = readCommand(reader)) != null) {
-                if (StringUtils.isEmpty(line)) {
-                    continue;
+        while ((line = reader.readLine()) != null) {
+            if (StringUtils.isEmpty(line)) {
+                continue;
+            } else {
+                if (exitCommands.contains(line)) {
+                    break;
                 } else {
-                    if (exitCommands.contains(line)) {
-                        break;
+                    if (listCommands.contains(line)) {
+                        getLog().info("Listing available projects: ");
+                        for (Object reactorProject : reactorProjects) {
+                            getLog().info(
+                                    "* "
+                                            + ((MavenProject) reactorProject)
+                                            .getArtifactId());
+                        }
                     } else {
-                        if (listCommands.contains(line)) {
-                            getLog().info("Listing available projects: ");
-                            for (Object reactorProject : reactorProjects) {
-                                getLog().info(
-                                        "* "
-                                                + ((MavenProject) reactorProject)
-                                                .getArtifactId());
-                            }
+                        if (HELP_COMMAND.equals(line)) {
+                            printHelp();
                         } else {
-                            if (HELP_COMMAND.equals(line)) {
-                                printHelp();
-                            } else {
-                                List<MojoCall> calls = new ArrayList<MojoCall>();
-                                try {
-                                    parseCommand(line, goals, calls);
-                                }
-                                catch (IllegalArgumentException ex) {
-                                    getLog().error("Invalid command: " + line);
-                                    continue;
-                                }
+                            List<MojoCall> calls = new ArrayList<MojoCall>();
+                            try {
+                                parseCommand(line, goals, calls);
+                            }
+                            catch (IllegalArgumentException ex) {
+                                getLog().error("Invalid command: " + line);
+                                continue;
+                            }
 
-                                try {
-                                    for (MojoCall call : calls) {
-                                        getLog().info("Executing: " + call);
-                                        long start = System.currentTimeMillis();
-                                        executeMojo(plugin(groupId(call.getGroupId()),
-                                                artifactId(call.getArtifactId()), version(call
-                                                        .getVersion(project))), goal(call
-                                                .getGoal()), configuration(),
-                                                executionEnvironment(project, session,
-                                                        pluginManager));
-                                        long now = System.currentTimeMillis();
-                                        getLog().info("Current project: " + project.getArtifactId());
-                                        getLog().info(
-                                                "Execution time: " + (now - start) + " ms");
-                                    }
+                            try {
+                                for (MojoCall call : calls) {
+                                    getLog().info("Executing: " + call);
+                                    long start = System.currentTimeMillis();
+                                    executeMojo(plugin(groupId(call.getGroupId()),
+                                            artifactId(call.getArtifactId()), version(call
+                                                    .getVersion(project))), goal(call
+                                            .getGoal()), configuration(),
+                                            executionEnvironment(project, session,
+                                                    pluginManager));
+                                    long now = System.currentTimeMillis();
+                                    getLog().info("Current project: " + project.getArtifactId());
+                                    getLog().info(
+                                            "Execution time: " + (now - start) + " ms");
                                 }
-                                catch (MojoExecutionException e) {
-                                    //We want to let the user continue entering another command after a plugin call fails, so just print and continue
-                                    e.printStackTrace();
-                                }
+                            }
+                            catch (MojoExecutionException e) {
+                                //We want to let the user continue entering another command after a plugin call fails, so just print and continue
+                                e.printStackTrace();
                             }
                         }
                     }
                 }
             }
-        }
-        catch (IOException e) {
-            throw new MojoExecutionException("Unable to execute cli commands",
-                    e);
         }
     }
 
@@ -385,18 +374,6 @@ public class ExecuteCliMojo extends AbstractMojo {
                 }
                 commands.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
             }
-        }
-    }
-
-    private String readCommand
-            (ConsoleReader
-                    reader) throws IOException {
-        try {
-            return reader.readLine();
-        }
-        catch (SocketException ex) {
-            // swallow
-            return null;
         }
     }
 

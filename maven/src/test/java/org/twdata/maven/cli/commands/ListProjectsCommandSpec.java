@@ -1,10 +1,11 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.HashSet;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.jmock.Expectations;
 import org.junit.runner.RunWith;
+import org.twdata.maven.cli.CliConsole;
 
 @RunWith(JDaveRunner.class)
 public class ListProjectsCommandSpec extends Specification<Void> {

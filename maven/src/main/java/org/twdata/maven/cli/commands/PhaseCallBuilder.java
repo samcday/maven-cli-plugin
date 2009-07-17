@@ -1,4 +1,4 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.PhaseCall;
 
-class PhaseCallBuilder {
+public class PhaseCallBuilder {
     private final MavenProject defaultProject;
     private final Map<String, MavenProject> modules;
     private final Map<String, String> userAliases;

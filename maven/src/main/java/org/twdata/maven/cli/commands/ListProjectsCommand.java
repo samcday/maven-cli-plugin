@@ -1,8 +1,9 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.twdata.maven.cli.CliConsole;
 
 public class ListProjectsCommand implements Command {
     private final Set<String> listCommands;

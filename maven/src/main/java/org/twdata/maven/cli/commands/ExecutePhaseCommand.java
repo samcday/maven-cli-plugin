@@ -1,4 +1,4 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.twdata.maven.cli.CliConsole;
+import org.twdata.maven.cli.PhaseCall;
+import org.twdata.maven.cli.PhaseCallRunner;
 
 public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;

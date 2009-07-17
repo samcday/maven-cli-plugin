@@ -11,6 +11,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.commands.Command;
+import org.twdata.maven.cli.commands.ExecutePhaseCommand;
+import org.twdata.maven.cli.commands.ExitCommand;
+import org.twdata.maven.cli.commands.ListProjectsCommand;
+import org.twdata.maven.cli.commands.PhaseCallBuilder;
 import org.twdata.maven.cli.externalapi.JLineCliConsole;
 
 /**

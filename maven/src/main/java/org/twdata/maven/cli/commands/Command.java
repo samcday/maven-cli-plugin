@@ -1,4 +1,4 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.Set;
 

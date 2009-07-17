@@ -1,4 +1,4 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +7,8 @@ import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.apache.maven.project.MavenProject;
 import org.junit.runner.RunWith;
+import org.twdata.maven.cli.PhaseCall;
+import org.twdata.maven.cli.PhaseCallTestDataBuilder;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 import static org.twdata.maven.cli.PhaseCallTestDataBuilder.aPhaseCall;
 

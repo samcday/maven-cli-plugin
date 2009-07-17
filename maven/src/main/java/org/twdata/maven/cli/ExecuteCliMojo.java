@@ -20,6 +20,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
@@ -52,7 +53,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                             "org.apache.maven.plugins:maven-surefire-plugin:test");
                     put("clean",
                             "org.apache.maven.plugins:maven-clean-plugin:clean");
-                    
+
                     //Help plugins not requiring parameters
                     put("help-system",
                             "org.apache.maven.plugins:maven-help-plugin:system");
@@ -60,7 +61,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                             "org.apache.maven.plugins:maven-help-plugin:effective-settings");
                     put("help-allprofiles",
                             "org.apache.maven.plugins:maven-help-plugin:all-profiles");
-                    
+
                     //Dependency plugins for analysis and management
                     put("dependency-tree",
                             "org.apache.maven.plugins:maven-dependency-plugin:tree");
@@ -107,7 +108,7 @@ public class ExecuteCliMojo extends AbstractMojo {
      * @parameter
      */
     private String prompt;
-    
+
     /**
      * TCP port to listen to for shell access
      *
@@ -231,50 +232,10 @@ public class ExecuteCliMojo extends AbstractMojo {
         while ((line = console.readLine()) != null) {
             if (StringUtils.isEmpty(line)) {
                 continue;
+            } else if (exitCommands.contains(line)) {
+                break;
             } else {
-                if (exitCommands.contains(line)) {
-                    break;
-                } else {
-                    if (listCommands.contains(line)) {
-                        console.writeInfo("Listing available projects: ");
-                        for (Object reactorProject : reactorProjects) {
-                            console.writeInfo("* " + ((MavenProject) reactorProject).getArtifactId());
-                        }
-                    } else {
-                        if (HELP_COMMAND.equals(line)) {
-                            printHelp();
-                        } else {
-                            List<MojoCall> calls = new ArrayList<MojoCall>();
-                            try {
-                                parseCommand(line, goals, calls);
-                            }
-                            catch (IllegalArgumentException ex) {
-                                console.writeError("Invalid command: " + line);
-                                continue;
-                            }
-
-                            try {
-                                for (MojoCall call : calls) {
-                                    getLog().info("Executing: " + call);
-                                    long start = System.currentTimeMillis();
-                                    executeMojo(plugin(groupId(call.getGroupId()),
-                                            artifactId(call.getArtifactId()), version(call
-                                                    .getVersion(project))), goal(call
-                                            .getGoal()), configuration(),
-                                            executionEnvironment(project, session,
-                                                    pluginManager));
-                                    long now = System.currentTimeMillis();
-                                    console.writeInfo("Current project: " + project.getArtifactId());
-                                    console.writeInfo("Execution time: " + (now - start) + " ms");
-                                }
-                            }
-                            catch (MojoExecutionException e) {
-                                //We want to let the user continue entering another command after a plugin call fails, so just print and continue
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
+                interpretCommand(line, goals, console);
             }
         }
     }
@@ -295,6 +256,48 @@ public class ExecuteCliMojo extends AbstractMojo {
         availableCommands.addAll(listCommands);
 
         return availableCommands;
+    }
+
+    private void interpretCommand(String line, Map<String, String> goals, CliConsole console) {
+        if (listCommands.contains(line)) {
+            console.writeInfo("Listing available projects: ");
+            for (Object reactorProject : reactorProjects) {
+                console.writeInfo("* " + ((MavenProject) reactorProject).getArtifactId());
+            }
+        } else {
+            if (HELP_COMMAND.equals(line)) {
+                printHelp();
+            } else {
+                List<MojoCall> calls = new ArrayList<MojoCall>();
+                try {
+                    calls = parseCommand(line, goals);
+                }
+                catch (IllegalArgumentException ex) {
+                    console.writeError("Invalid command: " + line);
+                    return;
+                }
+
+                try {
+                    for (MojoCall call : calls) {
+                        getLog().info("Executing: " + call);
+                        long start = System.currentTimeMillis();
+                        executeMojo(plugin(groupId(call.getGroupId()),
+                                artifactId(call.getArtifactId()), version(call
+                                        .getVersion(project))), goal(call
+                                .getGoal()), configuration(),
+                                executionEnvironment(project, session,
+                                        pluginManager));
+                        long now = System.currentTimeMillis();
+                        console.writeInfo("Current project: " + project.getArtifactId());
+                        console.writeInfo("Execution time: " + (now - start) + " ms");
+                    }
+                }
+                catch (MojoExecutionException e) {
+                    //We want to let the user continue entering another command after a plugin call fails, so just print and continue
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void printHelp() {
@@ -347,25 +350,26 @@ public class ExecuteCliMojo extends AbstractMojo {
      * @param aliases  The list of aliases available
      * @param commands The list of commands found so far
      */
-    private static void parseCommand
-            (String
-                    text, Map<String, String> aliases,
-             List<MojoCall> commands) {
+    private List<MojoCall> parseCommand(String text, Map<String, String> aliases) {
+        List<MojoCall> calls = new ArrayList<MojoCall>();
+
         String[] tokens = text.split(" ");
         if (tokens.length > 1) {
             for (String token : tokens) {
-                parseCommand(token, aliases, commands);
+                calls.addAll(parseCommand(token, aliases));
             }
         } else {
             if (aliases.containsKey(text)) {
-                parseCommand(aliases.get(text), aliases, commands);
+                calls.addAll(parseCommand(aliases.get(text), aliases));
             } else {
                 String[] parsed = text.split(":");
                 if (parsed.length < 3) {
                     throw new IllegalArgumentException("Invalid command: " + text);
                 }
-                commands.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
+                calls.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
             }
         }
+
+        return calls;
     }
 }

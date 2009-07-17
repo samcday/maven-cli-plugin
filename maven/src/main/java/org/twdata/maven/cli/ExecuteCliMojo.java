@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @goal execute
  */
 public class ExecuteCliMojo extends AbstractMojo {
-    private final Map<String, String> defaultAliases = Collections
+    private final Map<String, String> defaultGoals = Collections
             .unmodifiableMap(new HashMap<String, String>() {
                 {
                     put("compile",
@@ -156,7 +156,6 @@ public class ExecuteCliMojo extends AbstractMojo {
 
     private ServerSocket server = null;
 
-
     public void execute() throws MojoExecutionException {
         Thread shell = new Thread() {
             @Override
@@ -224,19 +223,16 @@ public class ExecuteCliMojo extends AbstractMojo {
 
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
         // build a list of command aliases
-        Map<String, String> aliases = buildCommands();
+        Map<String, String> goals = buildGoals();
 
         // build list of commands available for completion
-        List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(aliases.keySet());
-        availableCommands.addAll(exitCommands);
-        availableCommands.addAll(listCommands);
+        List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
 
         getLog().info("Waiting for commands");
         try {
             ConsoleReader reader = new ConsoleReader(in,
                     new OutputStreamWriter(out));
-            reader.addCompletor(new CommandsCompletor(availableCommands));
+            reader.addCompletor(new CommandsCompletor(validCommandTokens));
             reader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
             String line;
 
@@ -261,7 +257,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                             } else {
                                 List<MojoCall> calls = new ArrayList<MojoCall>();
                                 try {
-                                    parseCommand(line, aliases, calls);
+                                    parseCommand(line, goals, calls);
                                 }
                                 catch (IllegalArgumentException ex) {
                                     getLog().error("Invalid command: " + line);
@@ -300,29 +296,36 @@ public class ExecuteCliMojo extends AbstractMojo {
         }
     }
 
-    private Map<String, String> buildCommands
-            () {
-        Map<String, String> aliases = new HashMap<String, String>();
-        aliases.putAll(defaultAliases);
+    private Map<String, String> buildGoals() {
+        Map<String, String> goals = new HashMap<String, String>();
+        goals.putAll(defaultGoals);
         if (commands != null) {
-            aliases.putAll(commands);
+            goals.putAll(commands);
         }
-        return aliases;
+        return goals;
     }
 
-    private void printHelp
-            () {
+    private List<String> buildValidCommandTokens(Set<String> goalTokens) {
+        List<String> availableCommands = new ArrayList<String>();
+        availableCommands.addAll(goalTokens);
+        availableCommands.addAll(exitCommands);
+        availableCommands.addAll(listCommands);
+
+        return availableCommands;
+    }
+
+    private void printHelp() {
         StringWriter writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
 
-        Map<String, String> commands = buildCommands();
+        Map<String, String> goals = buildGoals();
         int maxLength = 0;
-        for (String key : commands.keySet()) {
+        for (String key : goals.keySet()) {
             maxLength = Math.max(maxLength, key.length());
         }
 
         pw.println("Commands: ");
-        for (Map.Entry<String, String> cmd : buildCommands().entrySet()) {
+        for (Map.Entry<String, String> cmd : buildGoals().entrySet()) {
             pw.print("  ");
             pw.print(cmd.getKey());
             pw.print("  ");

@@ -20,6 +20,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.commands.Command;
+import org.twdata.maven.cli.commands.ExitCommand;
+import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
@@ -73,23 +76,6 @@ public class ExecuteCliMojo extends AbstractMojo {
                             "org.apache.maven.plugins:maven-dependency-plugin:purge-local-repository");
                     put("dependency-analyze",
                             "org.apache.maven.plugins:maven-dependency-plugin:analyze");
-                }
-            });
-
-    private final List<String> listCommands = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("list");
-                    add("ls");
-                }
-            });
-
-    private final List<String> exitCommands = Collections
-            .unmodifiableList(new ArrayList<String>() {
-                {
-                    add("quit");
-                    add("exit");
-                    add("bye");
                 }
             });
 
@@ -153,6 +139,8 @@ public class ExecuteCliMojo extends AbstractMojo {
     private boolean acceptSocket = true;
 
     private ServerSocket server = null;
+    private Command listProjectsCommand = null;
+    private Command exitCommand = null;
 
     public void execute() throws MojoExecutionException {
         Thread shell = new Thread() {
@@ -220,10 +208,11 @@ public class ExecuteCliMojo extends AbstractMojo {
     }
 
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
+        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), prompt);
+
+        buildCliCommands(console);
         Map<String, String> goals = buildGoals();
         List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
-        String defaultPrompt = (prompt != null ? prompt : "maven2") + "> ";
-        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), defaultPrompt);
         console.setCompletor(new CommandsCompletor(validCommandTokens));
 
         console.writeInfo("Waiting for commands");
@@ -232,12 +221,22 @@ public class ExecuteCliMojo extends AbstractMojo {
         while ((line = console.readLine()) != null) {
             if (StringUtils.isEmpty(line)) {
                 continue;
-            } else if (exitCommands.contains(line)) {
+            } else if (exitCommand.matchesRequest(line)) {
                 break;
             } else {
                 interpretCommand(line, goals, console);
             }
         }
+    }
+
+    private void buildCliCommands(CliConsole console) {
+        Set<String> projectNames = new HashSet<String>();
+        for (Object reactorProject : reactorProjects) {
+            projectNames.add(((MavenProject) reactorProject).getArtifactId());
+        }
+
+        listProjectsCommand = new ListProjectsCommand(projectNames, console);
+        exitCommand = new ExitCommand();
     }
 
     private Map<String, String> buildGoals() {
@@ -252,18 +251,15 @@ public class ExecuteCliMojo extends AbstractMojo {
     private List<String> buildValidCommandTokens(Set<String> goalTokens) {
         List<String> availableCommands = new ArrayList<String>();
         availableCommands.addAll(goalTokens);
-        availableCommands.addAll(exitCommands);
-        availableCommands.addAll(listCommands);
+        availableCommands.addAll(exitCommand.getCommandNames());
+        availableCommands.addAll(listProjectsCommand.getCommandNames());
 
         return availableCommands;
     }
 
     private void interpretCommand(String line, Map<String, String> goals, CliConsole console) {
-        if (listCommands.contains(line)) {
-            console.writeInfo("Listing available projects: ");
-            for (Object reactorProject : reactorProjects) {
-                console.writeInfo("* " + ((MavenProject) reactorProject).getArtifactId());
-            }
+        if (listProjectsCommand.matchesRequest(line)) {
+            listProjectsCommand.run(line);
         } else {
             if (HELP_COMMAND.equals(line)) {
                 printHelp();
@@ -322,25 +318,24 @@ public class ExecuteCliMojo extends AbstractMojo {
         }
         pw.println("Exit commands: ");
         pw.print("  ");
-        pw.println(join(exitCommands));
+        pw.println(join(exitCommand.getCommandNames()));
 
         pw.println("List module commands: ");
         pw.print("  ");
-        pw.print(join(listCommands));
+        pw.print(join(listProjectsCommand.getCommandNames()));
         getLog().info(writer.toString());
     }
 
 
-    private String join
-            (List<String> list) {
+    private String join(Set<String> stringSet) {
+        if (stringSet.size() == 0) return "";
+
         StringBuffer sb = new StringBuffer();
-        for (int x = 0; x < list.size(); x++) {
-            sb.append(list.get(x));
-            if (x + 1 < list.size()) {
-                sb.append(", ");
-            }
+        for (String value : stringSet) {
+            sb.append(value).append(", ");
         }
-        return sb.toString();
+
+        return sb.substring(0, sb.length() - 2);
     }
 
     /**

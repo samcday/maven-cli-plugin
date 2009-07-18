@@ -12,6 +12,7 @@ import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
+import org.twdata.maven.cli.commands.ExecuteGoalCommand;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.CliConsole;
@@ -132,6 +133,7 @@ public class ExecuteCliMojo extends AbstractMojo {
     private ServerSocket server = null;
     private Command listProjectsCommand = null;
     private Command exitCommand = null;
+    private Command executeGoalCommand = null;
 
     public void execute() throws MojoExecutionException {
         Thread shell = new Thread() {
@@ -200,9 +202,9 @@ public class ExecuteCliMojo extends AbstractMojo {
 
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
         JLineCliConsole console = new JLineCliConsole(in, out, getLog(), prompt);
+        Map<String, String> goals = buildGoals();
 
         buildCliCommands(console);
-        Map<String, String> goals = buildGoals();
         List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
         console.setCompletor(new CommandsCompletor(validCommandTokens));
 
@@ -228,14 +230,16 @@ public class ExecuteCliMojo extends AbstractMojo {
 
         listProjectsCommand = new ListProjectsCommand(projectNames, console);
         exitCommand = new ExitCommand();
+        executeGoalCommand = new ExecuteGoalCommand(project, session, pluginManager, console, commands);
     }
 
     private Map<String, String> buildGoals() {
         Map<String, String> goals = new HashMap<String, String>();
         goals.putAll(defaultGoals);
-        if (commands != null) {
-            goals.putAll(commands);
+        if (commands == null) {
+            commands = new HashMap<String, String>();
         }
+        goals.putAll(commands);
         return goals;
     }
 
@@ -251,34 +255,12 @@ public class ExecuteCliMojo extends AbstractMojo {
     private void interpretCommand(String line, Map<String, String> goals, CliConsole console) {
         if (listProjectsCommand.matchesRequest(line)) {
             listProjectsCommand.run(line);
+        } else if (HELP_COMMAND.equals(line)) {
+            printHelp();
+        } else if (executeGoalCommand.matchesRequest(line)) {
+            executeGoalCommand.run(line);
         } else {
-            if (HELP_COMMAND.equals(line)) {
-                printHelp();
-            } else {
-                List<MojoCall> calls = new ArrayList<MojoCall>();
-                try {
-                    calls = parseCommand(line, goals);
-                }
-                catch (IllegalArgumentException ex) {
-                    console.writeError("Invalid command: " + line);
-                    return;
-                }
-
-                try {
-                    for (MojoCall call : calls) {
-                        getLog().info("Executing: " + call);
-                        long start = System.currentTimeMillis();
-                        call.run(project, session, pluginManager);
-                        long now = System.currentTimeMillis();
-                        console.writeInfo("Current project: " + project.getArtifactId());
-                        console.writeInfo("Execution time: " + (now - start) + " ms");
-                    }
-                }
-                catch (MojoExecutionException e) {
-                    //We want to let the user continue entering another command after a plugin call fails, so just print and continue
-                    e.printStackTrace();
-                }
-            }
+            console.writeError("Invalid command: " + line);
         }
     }
 

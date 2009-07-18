@@ -1,14 +1,5 @@
 package org.twdata.maven.cli;
 
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
-
 import java.io.*;
 import java.util.*;
 import java.net.ServerSocket;
@@ -277,12 +268,7 @@ public class ExecuteCliMojo extends AbstractMojo {
                     for (MojoCall call : calls) {
                         getLog().info("Executing: " + call);
                         long start = System.currentTimeMillis();
-                        executeMojo(plugin(groupId(call.getGroupId()),
-                                artifactId(call.getArtifactId()), version(call
-                                        .getVersion(project))), goal(call
-                                .getGoal()), configuration(),
-                                executionEnvironment(project, session,
-                                        pluginManager));
+                        call.run(project, session, pluginManager);
                         long now = System.currentTimeMillis();
                         console.writeInfo("Current project: " + project.getArtifactId());
                         console.writeInfo("Execution time: " + (now - start) + " ms");

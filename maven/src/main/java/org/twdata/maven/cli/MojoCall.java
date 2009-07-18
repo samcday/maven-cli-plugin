@@ -1,8 +1,19 @@
 package org.twdata.maven.cli;
 
 import java.util.List;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
+import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
 
 public class MojoCall {
     private final String groupId;
@@ -15,16 +26,13 @@ public class MojoCall {
         this.goal = goal;
     }
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public String getArtifactId() {
-        return artifactId;
-    }
-
-    public String getGoal() {
-        return goal;
+    public void run(MavenProject project, MavenSession session, PluginManager pluginManager)
+            throws MojoExecutionException {
+        executeMojo(
+                plugin(groupId(groupId), artifactId(artifactId), version(getVersion(project))),
+                goal(goal),
+                configuration(),
+                executionEnvironment(project, session, pluginManager));
     }
 
     /**
@@ -34,7 +42,7 @@ public class MojoCall {
      * @param project The maven project
      * @return The discovered plugin version
      */
-    public String getVersion(MavenProject project) {
+    private String getVersion(MavenProject project) {
         String version = null;
 
         @SuppressWarnings("unchecked")

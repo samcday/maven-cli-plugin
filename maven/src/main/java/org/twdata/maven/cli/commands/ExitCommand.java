@@ -15,6 +15,11 @@ public class ExitCommand implements Command {
         exitCommands = Collections.unmodifiableSet(commands);
     }
 
+    public void describe(CommandDescription description) {
+        description.describeCommandName("Exit commands")
+                .describeCommandToken("quit, exit, bye", null);
+    }
+
     public boolean run(String request) {
         return false;
     }

@@ -71,6 +71,18 @@ public class ExecuteGoalCommand implements Command {
         this.userDefinedAliases = userDefinedAliases;
     }
 
+    public void describe(CommandDescription description) {
+        description.describeCommandName("Goal commands");
+
+        for (String goal : defaultGoals.keySet()) {
+            description.describeCommandToken(goal, defaultGoals.get(goal));
+        }
+
+        for (String alias : userDefinedAliases.keySet()) {
+            description.describeCommandToken(alias, userDefinedAliases.get(alias));
+        }
+    }
+
     public Set<String> getCommandNames() {
         Set<String> commandNames = new HashSet<String>();
         commandNames.addAll(defaultGoals.keySet());

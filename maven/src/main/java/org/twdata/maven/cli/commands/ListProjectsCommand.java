@@ -21,6 +21,11 @@ public class ListProjectsCommand implements Command {
         listCommands = Collections.unmodifiableSet(commands);
     }
 
+    public void describe(CommandDescription description) {
+        description.describeCommandName("List module commands")
+                .describeCommandToken("list, ls", null);
+    }
+
     public boolean matchesRequest(String request) {
         return listCommands.contains(request);
     }

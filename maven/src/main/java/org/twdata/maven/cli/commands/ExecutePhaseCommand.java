@@ -43,6 +43,16 @@ public class ExecutePhaseCommand implements Command {
         phasesAndProperties = Collections.unmodifiableSortedSet(set);
     }
 
+    public void describe(CommandDescription description) {
+        description.describeCommandName("Phase Commands");
+
+        for (String phase : phasesAndProperties) {
+            if (!phase.startsWith("-")) {
+                description.describeCommandToken(phase, null);
+            }
+        }
+    }
+
     public Set<String> getCommandNames() {
         return phasesAndProperties;
     }

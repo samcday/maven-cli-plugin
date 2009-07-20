@@ -3,6 +3,8 @@ package org.twdata.maven.cli.commands;
 import java.util.Set;
 
 public interface Command {
+    void describe(CommandDescription description);
+    
     /**
      * @return the set of command names this command will respond to.
      */

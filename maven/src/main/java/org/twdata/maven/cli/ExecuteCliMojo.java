@@ -11,6 +11,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.commands.CliConsoleCommandDescription;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecuteGoalCommand;
 import org.twdata.maven.cli.commands.ExitCommand;
@@ -256,7 +257,7 @@ public class ExecuteCliMojo extends AbstractMojo {
         if (listProjectsCommand.matchesRequest(line)) {
             listProjectsCommand.run(line);
         } else if (HELP_COMMAND.equals(line)) {
-            printHelp();
+            printHelp(console);
         } else if (executeGoalCommand.matchesRequest(line)) {
             executeGoalCommand.run(line);
         } else {
@@ -264,75 +265,13 @@ public class ExecuteCliMojo extends AbstractMojo {
         }
     }
 
-    private void printHelp() {
-        StringWriter writer = new StringWriter();
-        PrintWriter pw = new PrintWriter(writer);
+    private void printHelp(CliConsole console) {
+        CliConsoleCommandDescription description = new CliConsoleCommandDescription(console);
 
-        Map<String, String> goals = buildGoals();
-        int maxLength = 0;
-        for (String key : goals.keySet()) {
-            maxLength = Math.max(maxLength, key.length());
-        }
+        executeGoalCommand.describe(description);
+        listProjectsCommand.describe(description);
+        exitCommand.describe(description);
 
-        pw.println("Commands: ");
-        for (Map.Entry<String, String> cmd : buildGoals().entrySet()) {
-            pw.print("  ");
-            pw.print(cmd.getKey());
-            pw.print("  ");
-            for (int x = 0; x < (maxLength - cmd.getKey().length()); x++) {
-                pw.print(" ");
-            }
-            pw.println(cmd.getValue());
-        }
-        pw.println("Exit commands: ");
-        pw.print("  ");
-        pw.println(join(exitCommand.getCommandNames()));
-
-        pw.println("List module commands: ");
-        pw.print("  ");
-        pw.print(join(listProjectsCommand.getCommandNames()));
-        getLog().info(writer.toString());
-    }
-
-
-    private String join(Set<String> stringSet) {
-        if (stringSet.size() == 0) return "";
-
-        StringBuffer sb = new StringBuffer();
-        for (String value : stringSet) {
-            sb.append(value).append(", ");
-        }
-
-        return sb.substring(0, sb.length() - 2);
-    }
-
-    /**
-     * Recursively parses commands to resolve all aliases
-     *
-     * @param text     The text to evaluate
-     * @param aliases  The list of aliases available
-     * @param commands The list of commands found so far
-     */
-    private List<MojoCall> parseCommand(String text, Map<String, String> aliases) {
-        List<MojoCall> calls = new ArrayList<MojoCall>();
-
-        String[] tokens = text.split(" ");
-        if (tokens.length > 1) {
-            for (String token : tokens) {
-                calls.addAll(parseCommand(token, aliases));
-            }
-        } else {
-            if (aliases.containsKey(text)) {
-                calls.addAll(parseCommand(aliases.get(text), aliases));
-            } else {
-                String[] parsed = text.split(":");
-                if (parsed.length < 3) {
-                    throw new IllegalArgumentException("Invalid command: " + text);
-                }
-                calls.add(new MojoCall(parsed[0], parsed[1], parsed[2]));
-            }
-        }
-
-        return calls;
+        description.outputDescription();
     }
 }

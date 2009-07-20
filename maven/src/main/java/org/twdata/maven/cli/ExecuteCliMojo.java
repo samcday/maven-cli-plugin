@@ -28,50 +28,6 @@ import org.twdata.maven.cli.console.JLineCliConsole;
  * @goal execute
  */
 public class ExecuteCliMojo extends AbstractMojo {
-    private final Map<String, String> defaultGoals = Collections
-            .unmodifiableMap(new HashMap<String, String>() {
-                {
-                    put("compile",
-                            "org.apache.maven.plugins:maven-compiler-plugin:compile");
-                    put("testCompile",
-                            "org.apache.maven.plugins:maven-compiler-plugin:testCompile");
-                    put("jar", "org.apache.maven.plugins:maven-jar-plugin:jar");
-                    put("war", "org.apache.maven.plugins:maven-war-plugin:war");
-                    put("resources",
-                            "org.apache.maven.plugins:maven-resources-plugin:resources");
-                    put("testResources",
-                            "org.apache.maven.plugins:maven-resources-plugin:testResources");
-                    put("install",
-                            "org.apache.maven.plugins:maven-install-plugin:install");
-                    put("deploy",
-                            "org.apache.maven.plugins:maven-deploy-plugin:deploy");
-                    put("test",
-                            "org.apache.maven.plugins:maven-surefire-plugin:test");
-                    put("clean",
-                            "org.apache.maven.plugins:maven-clean-plugin:clean");
-
-                    //Help plugins not requiring parameters
-                    put("help-system",
-                            "org.apache.maven.plugins:maven-help-plugin:system");
-                    put("help-effectivesettings",
-                            "org.apache.maven.plugins:maven-help-plugin:effective-settings");
-                    put("help-allprofiles",
-                            "org.apache.maven.plugins:maven-help-plugin:all-profiles");
-
-                    //Dependency plugins for analysis and management
-                    put("dependency-tree",
-                            "org.apache.maven.plugins:maven-dependency-plugin:tree");
-                    put("dependency-resolve",
-                            "org.apache.maven.plugins:maven-dependency-plugin:resolve");
-                    put("dependency-resolve-plugins",
-                            "org.apache.maven.plugins:maven-dependency-plugin:resolve-plugins");
-                    put("dependency-purge",
-                            "org.apache.maven.plugins:maven-dependency-plugin:purge-local-repository");
-                    put("dependency-analyze",
-                            "org.apache.maven.plugins:maven-dependency-plugin:analyze");
-                }
-            });
-
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
      *
@@ -204,11 +160,10 @@ public class ExecuteCliMojo extends AbstractMojo {
 
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
         JLineCliConsole console = new JLineCliConsole(in, out, getLog(), prompt);
-        Map<String, String> goals = buildGoals();
+        resolveUserDefinedGoals();
 
         buildCliCommands(console);
-        List<String> validCommandTokens = buildValidCommandTokens(goals.keySet());
-        console.setCompletor(new CommandsCompletor(validCommandTokens));
+        console.setCompletor(new CommandsCompletor(buildValidCommandTokens()));
 
         console.writeInfo("Waiting for commands");
         String line;
@@ -219,7 +174,7 @@ public class ExecuteCliMojo extends AbstractMojo {
             } else if (exitCommand.matchesRequest(line)) {
                 break;
             } else {
-                interpretCommand(line, goals, console);
+                interpretCommand(line, console);
             }
         }
     }
@@ -242,26 +197,22 @@ public class ExecuteCliMojo extends AbstractMojo {
         cliCommands.add(helpCommand);
     }
 
-    private Map<String, String> buildGoals() {
-        Map<String, String> goals = new HashMap<String, String>();
-        goals.putAll(defaultGoals);
+    private void resolveUserDefinedGoals() {
         if (commands == null) {
             commands = new HashMap<String, String>();
         }
-        goals.putAll(commands);
-        return goals;
     }
 
-    private List<String> buildValidCommandTokens(Set<String> goalTokens) {
+    private List<String> buildValidCommandTokens() {
         List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(goalTokens);
-        availableCommands.addAll(exitCommand.getCommandNames());
-        availableCommands.addAll(listProjectsCommand.getCommandNames());
+        for (Command command : cliCommands) {
+            availableCommands.addAll(command.getCommandNames());
+        }
 
         return availableCommands;
     }
 
-    private void interpretCommand(String line, Map<String, String> goals, CliConsole console) {
+    private void interpretCommand(String line, CliConsole console) {
         for (Command command : cliCommands) {
             if (command.matchesRequest(line)) {
                 command.run(line);

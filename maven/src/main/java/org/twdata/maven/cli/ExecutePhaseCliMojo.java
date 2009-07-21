@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
@@ -27,38 +24,13 @@ import org.twdata.maven.cli.console.JLineCliConsole;
  * @aggregator true
  * @goal execute-phase
  */
-public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpreter {
+public class ExecutePhaseCliMojo extends AbstractCliMojo {
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
      *
      * @parameter
      */
     private Map<String, String> userAliases;
-
-    /**
-     * Command prompt text.
-     *
-     * @parameter
-     */
-    private String prompt;
-
-    /**
-     * The Maven Project Object
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
-    /**
-     * The Maven Session Object
-     *
-     * @parameter expression="${session}"
-     * @required
-     * @readonly
-     */
-    protected MavenSession session;
 
     /**
      * The Maven PluginManager Object
@@ -68,17 +40,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
      */
     protected PluginManager pluginManager;
 
-    /**
-     * The reactor projects.
-     *
-     * @parameter expression="${reactorProjects}"
-     * @readonly
-     */
-    protected List reactorProjects;
-
-    protected Map<String, MavenProject> modules;
-
-    private List<Command> commands = new ArrayList<Command>();
     private CliConsole console;
 
     public void execute() throws MojoExecutionException {
@@ -93,14 +54,6 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
         startListeningForCommands();
     }
 
-    private void resolveModulesInProject() {
-        modules = new HashMap<String, MavenProject>();
-        for (Object reactorProject : reactorProjects) {
-            modules.put(((MavenProject) reactorProject).getArtifactId(),
-                    (MavenProject) reactorProject);
-        }
-    }
-
     private void resolveUserAliases() {
         if (userAliases == null) {
             userAliases = new HashMap<String, String>();
@@ -110,13 +63,13 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
     }
 
     private void buildCommands() throws MojoExecutionException {
-        commands.add(new ExitCommand());
-        commands.add(new ListProjectsCommand(modules.keySet(), console));
+        cliCommands.add(new ExitCommand());
+        cliCommands.add(new ListProjectsCommand(modules.keySet(), console));
 
         PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
         PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
 
-        commands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner, console));
+        cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner, console));
     }
 
     private List<String> buildValidCommandTokens() {
@@ -124,7 +77,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
         availableCommands.addAll(userAliases.keySet());
         availableCommands.addAll(modules.keySet());
 
-        for (Command command : commands) {
+        for (Command command : cliCommands) {
             availableCommands.addAll(command.getCommandNames());
         }
 
@@ -139,7 +92,7 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
             while ((line = console.readLine()) != null) {
                 if (StringUtils.isEmpty(line)) {
                     continue;
-                } else if (interpretCommand(line.replaceAll(" {2,}", " ")) == false) {
+                } else if (interpretCommand(line.replaceAll(" {2,}", " "), console) == false) {
                     break;
                 }
             }
@@ -153,15 +106,5 @@ public class ExecutePhaseCliMojo extends AbstractMojo implements CommandInterpre
             String value = userAliases.get(key).replaceAll("\\s{2,}", " ");
             userAliases.put(key, value);
         }
-    }
-
-    public boolean interpretCommand(String request) throws MojoExecutionException {
-        for (Command cmd : commands) {
-            if (cmd.matchesRequest(request)) {
-                return cmd.run(request);
-            }
-        }
-
-        return true;
     }
 }

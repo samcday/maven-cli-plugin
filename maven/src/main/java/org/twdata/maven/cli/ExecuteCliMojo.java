@@ -5,11 +5,8 @@ import java.util.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecuteGoalCommand;
@@ -27,20 +24,13 @@ import org.twdata.maven.cli.console.JLineCliConsole;
  * @aggregator true
  * @goal execute
  */
-public class ExecuteCliMojo extends AbstractMojo {
+public class ExecuteCliMojo extends AbstractCliMojo {
     /**
      * Command aliases. Commands should be in the form GROUP_ID:ARTIFACT_ID:GOAL
      *
      * @parameter
      */
     private Map<String, String> commands;
-
-    /**
-     * Command prompt text.
-     *
-     * @parameter
-     */
-    private String prompt;
 
     /**
      * TCP port to listen to for shell access
@@ -50,24 +40,6 @@ public class ExecuteCliMojo extends AbstractMojo {
     private String port = null;
 
     /**
-     * The Maven Project Object
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    protected MavenProject project;
-
-    /**
-     * The Maven Session Object
-     *
-     * @parameter expression="${session}"
-     * @required
-     * @readonly
-     */
-    protected MavenSession session;
-
-    /**
      * The Maven PluginManager Object
      *
      * @component
@@ -75,19 +47,10 @@ public class ExecuteCliMojo extends AbstractMojo {
      */
     protected PluginManager pluginManager;
 
-    /**
-     * The reactor projects.
-     *
-     * @parameter expression="${reactorProjects}"
-     * @readonly
-     */
-    protected List reactorProjects;
-
     private boolean acceptSocket = true;
 
     private ServerSocket server = null;
 
-    private List<Command> cliCommands = new ArrayList<Command>();
     private Command listProjectsCommand = null;
     private Command exitCommand = null;
     private Command executeGoalCommand = null;
@@ -161,6 +124,7 @@ public class ExecuteCliMojo extends AbstractMojo {
     private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
         JLineCliConsole console = new JLineCliConsole(in, out, getLog(), prompt);
         resolveUserDefinedGoals();
+        resolveModulesInProject();
 
         buildCliCommands(console);
         console.setCompletor(new CommandsCompletor(buildValidCommandTokens()));
@@ -178,13 +142,8 @@ public class ExecuteCliMojo extends AbstractMojo {
     }
 
     private void buildCliCommands(CliConsole console) {
-        Set<String> projectNames = new HashSet<String>();
-        for (Object reactorProject : reactorProjects) {
-            projectNames.add(((MavenProject) reactorProject).getArtifactId());
-        }
-
         executeGoalCommand = new ExecuteGoalCommand(project, session, pluginManager, console, commands);
-        listProjectsCommand = new ListProjectsCommand(projectNames, console);
+        listProjectsCommand = new ListProjectsCommand(modules.keySet(), console);
         exitCommand = new ExitCommand();
 
         cliCommands.add(executeGoalCommand);
@@ -208,16 +167,5 @@ public class ExecuteCliMojo extends AbstractMojo {
         }
 
         return availableCommands;
-    }
-
-    private boolean interpretCommand(String line, CliConsole console) {
-        for (Command command : cliCommands) {
-            if (command.matchesRequest(line)) {
-                return command.run(line);
-            }
-        }
-
-        console.writeError("Invalid command: " + line);
-        return true;
     }
 }

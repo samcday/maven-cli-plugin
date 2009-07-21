@@ -117,7 +117,7 @@ public class ExecuteGoalCommand implements Command {
             }
         }
 
-        return false;
+        return true;
     }
 
     private void runMojo(String mojoString) throws MojoExecutionException {

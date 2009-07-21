@@ -10,9 +10,6 @@ import org.apache.maven.plugin.PluginManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecuteGoalCommand;
-import org.twdata.maven.cli.commands.ExitCommand;
-import org.twdata.maven.cli.commands.HelpCommand;
-import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
@@ -49,11 +46,6 @@ public class ExecuteCliMojo extends AbstractCliMojo {
     private boolean acceptSocket = true;
 
     private ServerSocket server = null;
-
-    private Command listProjectsCommand = null;
-    private Command exitCommand = null;
-    private Command executeGoalCommand = null;
-    private Command helpCommand = null;
 
     public void execute() throws MojoExecutionException {
         Thread shell = new Thread() {
@@ -141,16 +133,8 @@ public class ExecuteCliMojo extends AbstractCliMojo {
     }
 
     private void buildCliCommands() {
-        executeGoalCommand = new ExecuteGoalCommand(project, session, pluginManager, commands);
-        listProjectsCommand = new ListProjectsCommand(modules.keySet());
-        exitCommand = new ExitCommand();
-
-        cliCommands.add(executeGoalCommand);
-        cliCommands.add(listProjectsCommand);
-        cliCommands.add(exitCommand);
-
-        helpCommand = new HelpCommand(cliCommands);
-        cliCommands.add(helpCommand);
+        cliCommands.add(new ExecuteGoalCommand(project, session, pluginManager, commands));
+        buildDefaultCommands();
     }
 
     private void resolveUserDefinedGoals() {

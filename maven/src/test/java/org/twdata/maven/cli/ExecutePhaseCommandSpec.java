@@ -7,7 +7,6 @@ import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
-import org.twdata.maven.cli.console.CliConsole;
 
 @RunWith(JDaveRunner.class)
 public class ExecutePhaseCommandSpec extends Specification<Void> {
@@ -15,9 +14,8 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
         private Set<String> modules = new HashSet<String>();
         private PhaseCallBuilder mockBuilder = mock(PhaseCallBuilder.class);
         private PhaseCallRunner mockRunner = mock(PhaseCallRunner.class);
-        private CliConsole mockConsole = mock(CliConsole.class);
         private ExecutePhaseCommand command =
-                new ExecutePhaseCommand(modules, mockBuilder, mockRunner, mockConsole);
+                new ExecutePhaseCommand(modules, mockBuilder, mockRunner);
 
         public void shouldNotMatchRequestIfAnyTheTokensIsInvalid() {
             specify(command.matchesRequest("-o build"), should.equal(false));

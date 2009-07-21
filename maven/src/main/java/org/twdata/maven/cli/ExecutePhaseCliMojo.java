@@ -11,8 +11,6 @@ import org.apache.maven.plugin.PluginManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
-import org.twdata.maven.cli.commands.ExitCommand;
-import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
@@ -63,13 +61,11 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
     }
 
     private void buildCliCommands() throws MojoExecutionException {
-        cliCommands.add(new ExitCommand());
-        cliCommands.add(new ListProjectsCommand(modules.keySet()));
-
         PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
         PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
 
         cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner));
+        buildDefaultCommands();
     }
 
     private List<String> buildValidCommandTokens() {

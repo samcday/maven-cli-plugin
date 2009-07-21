@@ -22,7 +22,7 @@ public class ListProjectsCommandSpec extends Specification<Void> {
                         .with(any(String.class));
             }});
 
-            new ListProjectsCommand(names, mockConsole).run(null, mockConsole);
+            new ListProjectsCommand(names).run(null, mockConsole);
         }
     }
 }

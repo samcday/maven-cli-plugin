@@ -8,6 +8,9 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.commands.Command;
+import org.twdata.maven.cli.commands.ExitCommand;
+import org.twdata.maven.cli.commands.HelpCommand;
+import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.CliConsole;
 
 public abstract class AbstractCliMojo extends AbstractMojo {
@@ -63,5 +66,11 @@ public abstract class AbstractCliMojo extends AbstractMojo {
 
         console.writeError("Invalid command: " + request);
         return true;
+    }
+
+    protected void buildDefaultCommands() {
+        cliCommands.add(new ExitCommand());
+        cliCommands.add(new ListProjectsCommand(modules.keySet()));
+        cliCommands.add(new HelpCommand(cliCommands));
     }
 }

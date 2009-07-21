@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class HelpCommand implements Command {
@@ -24,8 +25,8 @@ public class HelpCommand implements Command {
                 .describeCommandToken("help, ?", null);
     }
 
-    public Set<String> getCommandNames() {
-        return helpCommands;
+    public void collectCommandTokens(CommandTokenCollector collector) {
+        collector.addCommandTokens(helpCommands);
     }
 
     public boolean matchesRequest(String request) {

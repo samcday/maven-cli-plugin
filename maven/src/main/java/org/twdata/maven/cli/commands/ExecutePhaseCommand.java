@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.PhaseCall;
 import org.twdata.maven.cli.PhaseCallRunner;
@@ -51,8 +52,9 @@ public class ExecutePhaseCommand implements Command {
         }
     }
 
-    public Set<String> getCommandNames() {
-        return phasesAndProperties;
+    public void collectCommandTokens(CommandTokenCollector collector) {
+        collector.addCommandTokens(phasesAndProperties);
+        collector.addCommandTokens(modules);
     }
 
     public boolean matchesRequest(String request) {

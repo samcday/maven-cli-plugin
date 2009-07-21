@@ -8,7 +8,6 @@ import java.net.Socket;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.codehaus.plexus.util.StringUtils;
-import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecuteGoalCommand;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
@@ -141,14 +140,5 @@ public class ExecuteCliMojo extends AbstractCliMojo {
         if (commands == null) {
             commands = new HashMap<String, String>();
         }
-    }
-
-    private List<String> buildValidCommandTokens() {
-        List<String> availableCommands = new ArrayList<String>();
-        for (Command command : cliCommands) {
-            availableCommands.addAll(command.getCommandNames());
-        }
-
-        return availableCommands;
     }
 }

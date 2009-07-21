@@ -3,6 +3,7 @@ package org.twdata.maven.cli.commands;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class ExitCommand implements Command {
@@ -21,12 +22,12 @@ public class ExitCommand implements Command {
                 .describeCommandToken("quit, exit, bye", null);
     }
 
-    public boolean run(String request, CliConsole console) {
-        return false;
+    public void collectCommandTokens(CommandTokenCollector collector) {
+        collector.addCommandTokens(exitCommands);
     }
 
-    public Set<String> getCommandNames() {
-        return exitCommands;
+    public boolean run(String request, CliConsole console) {
+        return false;
     }
 
     public boolean matchesRequest(String request) {

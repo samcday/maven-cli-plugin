@@ -3,6 +3,7 @@ package org.twdata.maven.cli.commands;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class ListProjectsCommand implements Command {
@@ -24,12 +25,12 @@ public class ListProjectsCommand implements Command {
                 .describeCommandToken("list, ls", null);
     }
 
-    public boolean matchesRequest(String request) {
-        return listCommands.contains(request);
+    public void collectCommandTokens(CommandTokenCollector collector) {
+        collector.addCommandTokens(listCommands);
     }
 
-    public Set<String> getCommandNames() {
-        return listCommands;
+    public boolean matchesRequest(String request) {
+        return listCommands.contains(request);
     }
 
     public boolean run(String request, CliConsole console) {

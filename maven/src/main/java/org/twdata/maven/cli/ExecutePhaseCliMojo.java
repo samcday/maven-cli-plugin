@@ -1,7 +1,6 @@
 package org.twdata.maven.cli;
 
 import org.twdata.maven.cli.console.CliConsole;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +8,13 @@ import java.util.Map;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.codehaus.plexus.util.StringUtils;
-import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing
- * users to execute plugins directly.
+ * users to execute phases directly.
  *
  * @requiresDependencyResolution execute
  * @aggregator true
@@ -29,14 +27,6 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
      * @parameter
      */
     private Map<String, String> userAliases;
-
-    /**
-     * The Maven PluginManager Object
-     *
-     * @component
-     * @required
-     */
-    protected PluginManager pluginManager;
 
     private CliConsole console;
 
@@ -66,18 +56,6 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
 
         cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner));
         buildDefaultCommands();
-    }
-
-    private List<String> buildValidCommandTokens() {
-        List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(userAliases.keySet());
-        availableCommands.addAll(modules.keySet());
-
-        for (Command command : cliCommands) {
-            availableCommands.addAll(command.getCommandNames());
-        }
-
-        return availableCommands;
     }
 
     private void startListeningForCommands() throws MojoExecutionException {

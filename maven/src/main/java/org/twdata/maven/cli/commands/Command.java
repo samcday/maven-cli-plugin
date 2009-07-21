@@ -1,16 +1,13 @@
 package org.twdata.maven.cli.commands;
 
-import java.util.Set;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
 
 public interface Command {
     void describe(CommandDescription description);
-    
-    /**
-     * @return the set of command names this command will respond to.
-     */
-    Set<String> getCommandNames();
 
+    void collectCommandTokens(CommandTokenCollector collector);
+    
     /**
      *
      * @param request the command request.

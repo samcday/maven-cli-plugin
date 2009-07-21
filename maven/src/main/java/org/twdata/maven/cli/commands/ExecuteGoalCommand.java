@@ -2,13 +2,12 @@ package org.twdata.maven.cli.commands;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.MojoCall;
 import org.twdata.maven.cli.console.CliConsole;
 
@@ -81,11 +80,9 @@ public class ExecuteGoalCommand implements Command {
         }
     }
 
-    public Set<String> getCommandNames() {
-        Set<String> commandNames = new HashSet<String>();
-        commandNames.addAll(defaultGoals.keySet());
-        commandNames.addAll(userDefinedAliases.keySet());
-        return commandNames;
+    public void collectCommandTokens(CommandTokenCollector collector) {
+        collector.addCommandTokens(defaultGoals.keySet());
+        collector.addCommandTokens(userDefinedAliases.keySet());
     }
 
     public boolean matchesRequest(String request) {

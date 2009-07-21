@@ -73,4 +73,15 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         console.writeError("Invalid command: " + request);
         return true;
     }
+
+    protected List<String> buildValidCommandTokens() {
+        CommandTokenCollector collector = new CommandTokenCollector();
+        for (Command command : cliCommands) {
+            command.collectCommandTokens(collector);
+        }
+
+        List<String> availableCommands = new ArrayList<String>();
+        availableCommands.addAll(collector.getCollectedTokens());
+        return availableCommands;
+    }
 }

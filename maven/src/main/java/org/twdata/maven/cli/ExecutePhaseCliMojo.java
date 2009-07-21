@@ -1,13 +1,9 @@
 package org.twdata.maven.cli;
 
+import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.console.CliConsole;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
-import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
 import org.twdata.maven.cli.console.JLineCliConsole;
@@ -30,16 +26,9 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
 
     private CliConsole console;
 
-    public void execute() throws MojoExecutionException {
-        resolveModulesInProject();
+    @Override
+    protected void beforeExecuteSetup() {
         resolveUserAliases();
-        console = new JLineCliConsole(System.in, System.out, getLog(), prompt);
-
-        buildCliCommands();
-        List<String> validCommandTokens = buildValidCommandTokens();
-
-        ((JLineCliConsole) console).setCompletor(new CommandsCompletor(validCommandTokens));
-        startListeningForCommands();
     }
 
     private void resolveUserAliases() {
@@ -50,35 +39,24 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
         compactWhiteSpacesInUserAliases();
     }
 
-    private void buildCliCommands() throws MojoExecutionException {
-        PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
-        PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
-
-        cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner));
-        buildDefaultCommands();
-    }
-
-    private void startListeningForCommands() throws MojoExecutionException {
-        try {
-            String line;
-
-            getLog().info("Waiting for commands");
-            while ((line = console.readLine()) != null) {
-                if (StringUtils.isEmpty(line)) {
-                    continue;
-                } else if (interpretCommand(line.replaceAll(" {2,}", " "), console) == false) {
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            throw new MojoExecutionException("Unable to execute cli commands", e);
-        }
-    }
-
     private void compactWhiteSpacesInUserAliases() {
         for (String key : userAliases.keySet()) {
             String value = userAliases.get(key).replaceAll("\\s{2,}", " ");
             userAliases.put(key, value);
         }
+    }
+
+    @Override
+    protected void afterExecuteSetup() {
+        console = new JLineCliConsole(System.in, System.out, getLog(), getCommandsCompletor(), prompt);
+        new CliShell(cliCommands, console).run();
+    }
+
+    @Override
+    protected Command getSpecializedCliMojoCommand() {
+        PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
+        PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
+
+        return new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner);
     }
 }

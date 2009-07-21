@@ -5,7 +5,6 @@ import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
@@ -18,8 +17,7 @@ public class PhaseCallRunner {
     private final File userDir;
     private boolean pluginExecutionOfflineMode;
 
-    public PhaseCallRunner(MavenSession session, MavenProject project,
-            Log logger) throws MojoExecutionException {
+    public PhaseCallRunner(MavenSession session, MavenProject project, Log logger) {
         this.session = session;
         this.project = project;
         this.logger = logger;

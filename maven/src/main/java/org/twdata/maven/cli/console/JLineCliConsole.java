@@ -13,19 +13,17 @@ public class JLineCliConsole implements CliConsole {
     private final ConsoleReader consoleReader;
     private final Log logger;
 
-    public JLineCliConsole(InputStream in, PrintStream out, Log logger, String prompt) {
+    public JLineCliConsole(InputStream in, PrintStream out, Log logger, Completor completor,
+            String prompt) {
         try {
             consoleReader = new ConsoleReader(in, new OutputStreamWriter(out));
             consoleReader.setBellEnabled(false);
             consoleReader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
             this.logger = logger;
+            consoleReader.addCompletor(completor);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to create reader to read commands.", ex);
         }
-    }
-
-    public void setCompletor(Completor completor) {
-        consoleReader.addCompletor(completor);
     }
 
     @Override

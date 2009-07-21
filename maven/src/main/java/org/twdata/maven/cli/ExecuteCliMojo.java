@@ -1,13 +1,15 @@
 package org.twdata.maven.cli;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.maven.plugin.PluginManager;
-import org.codehaus.plexus.util.StringUtils;
+import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExecuteGoalCommand;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
@@ -46,7 +48,13 @@ public class ExecuteCliMojo extends AbstractCliMojo {
 
     private ServerSocket server = null;
 
-    public void execute() throws MojoExecutionException {
+    @Override
+    protected void beforeExecuteSetup() {
+        resolveUserDefinedGoals();
+    }
+
+    @Override
+    protected void afterExecuteSetup() {
         Thread shell = new Thread() {
             @Override
             public void run() {
@@ -56,9 +64,6 @@ public class ExecuteCliMojo extends AbstractCliMojo {
                     if (server != null) {
                         server.close();
                     }
-                }
-                catch (MojoExecutionException e) {
-                    throw new RuntimeException(e);
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
@@ -82,10 +87,14 @@ public class ExecuteCliMojo extends AbstractCliMojo {
         catch (InterruptedException e) {
             // ignore
         }
-
     }
 
-    private void openSocket(ServerSocket server, int port) throws MojoExecutionException {
+    @Override
+    protected Command getSpecializedCliMojoCommand() {
+        return new ExecuteGoalCommand(project, session, pluginManager, commands);
+    }
+
+    private void openSocket(ServerSocket server, int port) {
         System.out.println("Opening port " + port + " for socket cli access");
         while (acceptSocket) {
             Socket connection = null;
@@ -111,29 +120,10 @@ public class ExecuteCliMojo extends AbstractCliMojo {
         }
     }
 
-    private void displayShell(InputStream in, PrintStream out) throws MojoExecutionException {
-        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), prompt);
-        resolveUserDefinedGoals();
-        resolveModulesInProject();
+    private void displayShell(InputStream in, PrintStream out) {
+        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), getCommandsCompletor(), prompt);
 
-        buildCliCommands();
-        console.setCompletor(new CommandsCompletor(buildValidCommandTokens()));
-
-        console.writeInfo("Waiting for commands");
-        String line;
-
-        while ((line = console.readLine()) != null) {
-            if (StringUtils.isEmpty(line)) {
-                continue;
-            } else if (interpretCommand(line, console) == false) {
-                break;
-            }
-        }
-    }
-
-    private void buildCliCommands() {
-        cliCommands.add(new ExecuteGoalCommand(project, session, pluginManager, commands));
-        buildDefaultCommands();
+        new CliShell(cliCommands, console).run();
     }
 
     private void resolveUserDefinedGoals() {

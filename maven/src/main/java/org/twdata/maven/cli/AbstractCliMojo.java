@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jline.Completor;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.HelpCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
-import org.twdata.maven.cli.console.CliConsole;
 
 public abstract class AbstractCliMojo extends AbstractMojo {
     /**
@@ -50,31 +51,33 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     protected Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     protected List<Command> cliCommands = new ArrayList<Command>();
 
-    protected void resolveModulesInProject() {
+    protected abstract void beforeExecuteSetup();
+    protected abstract void afterExecuteSetup();
+    protected abstract Command getSpecializedCliMojoCommand();
+
+    public final void execute() throws MojoExecutionException {
+        beforeExecuteSetup();
+        resolveModulesInProject();
+        buildCommands();
+        buildValidCommandTokens();
+        afterExecuteSetup();
+    }
+
+    private void resolveModulesInProject() {
         for (Object reactorProject : reactorProjects) {
             modules.put(((MavenProject) reactorProject).getArtifactId(),
                     (MavenProject) reactorProject);
         }
     }
 
-    protected void buildDefaultCommands() {
+    private void buildCommands() {
+        cliCommands.add(getSpecializedCliMojoCommand());
         cliCommands.add(new ExitCommand());
         cliCommands.add(new ListProjectsCommand(modules.keySet()));
         cliCommands.add(new HelpCommand(cliCommands));
     }
 
-    protected boolean interpretCommand(String request, CliConsole console) {
-        for (Command command : cliCommands) {
-            if (command.matchesRequest(request)) {
-                return command.run(request, console);
-            }
-        }
-
-        console.writeError("Invalid command: " + request);
-        return true;
-    }
-
-    protected List<String> buildValidCommandTokens() {
+    private List<String> buildValidCommandTokens() {
         CommandTokenCollector collector = new CommandTokenCollector();
         for (Command command : cliCommands) {
             command.collectCommandTokens(collector);
@@ -83,5 +86,9 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         List<String> availableCommands = new ArrayList<String>();
         availableCommands.addAll(collector.getCollectedTokens());
         return availableCommands;
+    }
+
+    protected Completor getCommandsCompletor() {
+        return new CommandsCompletor(buildValidCommandTokens());
     }
 }

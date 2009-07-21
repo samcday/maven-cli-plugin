@@ -57,6 +57,12 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         }
     }
 
+    protected void buildDefaultCommands() {
+        cliCommands.add(new ExitCommand());
+        cliCommands.add(new ListProjectsCommand(modules.keySet()));
+        cliCommands.add(new HelpCommand(cliCommands));
+    }
+
     protected boolean interpretCommand(String request, CliConsole console) {
         for (Command command : cliCommands) {
             if (command.matchesRequest(request)) {
@@ -66,11 +72,5 @@ public abstract class AbstractCliMojo extends AbstractMojo {
 
         console.writeError("Invalid command: " + request);
         return true;
-    }
-
-    protected void buildDefaultCommands() {
-        cliCommands.add(new ExitCommand());
-        cliCommands.add(new ListProjectsCommand(modules.keySet()));
-        cliCommands.add(new HelpCommand(cliCommands));
     }
 }

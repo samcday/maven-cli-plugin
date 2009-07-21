@@ -67,7 +67,7 @@ public class ExecutePhaseCommand implements Command {
     }
 
     private boolean matchesModules(String token) {
-        String regex = token.replaceAll("\\*", ".*");
+        String regex = token.replaceAll("\\*", ".*").replaceAll("\\?", "\\\\?");
         for (String module : modules) {
             if (module.matches(regex)) {
                 return true;

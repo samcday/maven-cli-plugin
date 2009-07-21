@@ -1,12 +1,11 @@
-package org.twdata.maven.cli;
+package org.twdata.maven.cli.commands;
 
+import org.twdata.maven.cli.*;
 import java.util.HashSet;
 import java.util.Set;
 import jdave.Specification;
 import jdave.junit4.JDaveRunner;
 import org.junit.runner.RunWith;
-import org.twdata.maven.cli.commands.ExecutePhaseCommand;
-import org.twdata.maven.cli.commands.PhaseCallBuilder;
 
 @RunWith(JDaveRunner.class)
 public class ExecutePhaseCommandSpec extends Specification<Void> {
@@ -32,6 +31,11 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
         public void shouldNotRejectIfMatchesModuleWildCardInput() {
             modules.add("module");
             specify(command.matchesRequest("mod*"), should.equal(true));
+        }
+
+        public void shouldNotRaiseErrorWhenInputIsQuestionMarkWhenModuleExists() {
+            modules.add("module");
+            command.matchesRequest("?");
         }
     }
 }

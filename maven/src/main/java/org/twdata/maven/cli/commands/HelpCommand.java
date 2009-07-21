@@ -42,6 +42,6 @@ public class HelpCommand implements Command {
         }
 
         description.outputDescription();
-        return false;
+        return true;
     }
 }

@@ -171,10 +171,8 @@ public class ExecuteCliMojo extends AbstractMojo {
         while ((line = console.readLine()) != null) {
             if (StringUtils.isEmpty(line)) {
                 continue;
-            } else if (exitCommand.matchesRequest(line)) {
+            } else if (interpretCommand(line, console) == false) {
                 break;
-            } else {
-                interpretCommand(line, console);
             }
         }
     }
@@ -212,14 +210,14 @@ public class ExecuteCliMojo extends AbstractMojo {
         return availableCommands;
     }
 
-    private void interpretCommand(String line, CliConsole console) {
+    private boolean interpretCommand(String line, CliConsole console) {
         for (Command command : cliCommands) {
             if (command.matchesRequest(line)) {
-                command.run(line);
-                return;
+                return command.run(line);
             }
         }
 
         console.writeError("Invalid command: " + line);
+        return true;
     }
 }

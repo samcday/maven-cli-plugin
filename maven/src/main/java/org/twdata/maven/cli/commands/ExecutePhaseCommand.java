@@ -14,15 +14,13 @@ public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;
     private final PhaseCallBuilder commandCallBuilder;
     private final PhaseCallRunner runner;
-    private final CliConsole console;
     private final SortedSet<String> phasesAndProperties;
 
     public ExecutePhaseCommand(Set<String> modules, PhaseCallBuilder commandCallBuilder,
-            PhaseCallRunner runner, CliConsole console) {
+            PhaseCallRunner runner) {
         this.modules = modules;
         this.commandCallBuilder = commandCallBuilder;
         this.runner = runner;
-        this.console = console;
 
         SortedSet<String> set = new TreeSet<String>();
         set.add("clean");
@@ -79,7 +77,7 @@ public class ExecutePhaseCommand implements Command {
         return false;
     }
 
-    public boolean run(String request) {
+    public boolean run(String request, CliConsole console) {
         try {
             List<PhaseCall> calls = new ArrayList<PhaseCall>();
             calls = commandCallBuilder.parseCommand(request);

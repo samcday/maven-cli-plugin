@@ -9,10 +9,8 @@ public class ListProjectsCommand implements Command {
     private final Set<String> listCommands;
 
     private final Set<String> projectNames;
-    private final CliConsole console;
 
-    public ListProjectsCommand(Set<String> projectNames, CliConsole console) {
-        this.console = console;
+    public ListProjectsCommand(Set<String> projectNames) {
         this.projectNames = projectNames;
 
         Set<String> commands = new HashSet<String>();
@@ -34,7 +32,7 @@ public class ListProjectsCommand implements Command {
         return listCommands;
     }
 
-    public boolean run(String request) {
+    public boolean run(String request, CliConsole console) {
         console.writeInfo("Listing available projects: ");
 
         for (String projectName : projectNames) {

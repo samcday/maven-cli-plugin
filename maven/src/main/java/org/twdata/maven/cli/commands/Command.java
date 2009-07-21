@@ -1,6 +1,7 @@
 package org.twdata.maven.cli.commands;
 
 import java.util.Set;
+import org.twdata.maven.cli.console.CliConsole;
 
 public interface Command {
     void describe(CommandDescription description);
@@ -24,5 +25,5 @@ public interface Command {
      * @return false if the command wants to end the mojo after it finish
      * running run().
      */
-    boolean run(String request);
+    public boolean run(String request, CliConsole console);
 }

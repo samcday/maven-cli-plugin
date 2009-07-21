@@ -59,15 +59,13 @@ public class ExecuteGoalCommand implements Command {
     private final Map<String, String> userDefinedAliases;
     private final MavenProject project;
     private final MavenSession session;
-    private final CliConsole console;
     private final PluginManager pluginManager;
 
     public ExecuteGoalCommand(MavenProject project, MavenSession session,
-            PluginManager pluginManager, CliConsole console, Map<String, String> userDefinedAliases) {
+            PluginManager pluginManager, Map<String, String> userDefinedAliases) {
         this.project = project;
         this.session = session;
         this.pluginManager = pluginManager;
-        this.console = console;
         this.userDefinedAliases = userDefinedAliases;
     }
 
@@ -102,15 +100,15 @@ public class ExecuteGoalCommand implements Command {
         return true;
     }
 
-    public boolean run(String request) {
+    public boolean run(String request, CliConsole console) {
         for (String token : request.split(" ")) {
             try {
                 if (defaultGoals.containsKey(token)) {
-                    runMojo(defaultGoals.get(token));
+                    runMojo(defaultGoals.get(token), console);
                 } else if (userDefinedAliases.containsKey(token)) {
-                    run(userDefinedAliases.get(token));
+                    run(userDefinedAliases.get(token), console);
                 } else {
-                    runMojo(token);
+                    runMojo(token, console);
                 }
             } catch (MojoExecutionException ex) {
                 throw new RuntimeException(ex);
@@ -120,7 +118,7 @@ public class ExecuteGoalCommand implements Command {
         return true;
     }
 
-    private void runMojo(String mojoString) throws MojoExecutionException {
+    private void runMojo(String mojoString, CliConsole console) throws MojoExecutionException {
         String[] mojoInfo = mojoString.split(":");
         MojoCall call = new MojoCall(mojoInfo[0], mojoInfo[1], mojoInfo[2]);
 

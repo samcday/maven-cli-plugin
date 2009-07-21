@@ -13,7 +13,6 @@ import org.twdata.maven.cli.commands.ExecuteGoalCommand;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.HelpCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
-import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
@@ -126,7 +125,7 @@ public class ExecuteCliMojo extends AbstractCliMojo {
         resolveUserDefinedGoals();
         resolveModulesInProject();
 
-        buildCliCommands(console);
+        buildCliCommands();
         console.setCompletor(new CommandsCompletor(buildValidCommandTokens()));
 
         console.writeInfo("Waiting for commands");
@@ -141,16 +140,16 @@ public class ExecuteCliMojo extends AbstractCliMojo {
         }
     }
 
-    private void buildCliCommands(CliConsole console) {
-        executeGoalCommand = new ExecuteGoalCommand(project, session, pluginManager, console, commands);
-        listProjectsCommand = new ListProjectsCommand(modules.keySet(), console);
+    private void buildCliCommands() {
+        executeGoalCommand = new ExecuteGoalCommand(project, session, pluginManager, commands);
+        listProjectsCommand = new ListProjectsCommand(modules.keySet());
         exitCommand = new ExitCommand();
 
         cliCommands.add(executeGoalCommand);
         cliCommands.add(listProjectsCommand);
         cliCommands.add(exitCommand);
 
-        helpCommand = new HelpCommand(cliCommands, console);
+        helpCommand = new HelpCommand(cliCommands);
         cliCommands.add(helpCommand);
     }
 

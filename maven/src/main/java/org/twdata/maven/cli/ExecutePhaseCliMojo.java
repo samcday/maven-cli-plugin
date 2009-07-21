@@ -47,7 +47,7 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
         resolveUserAliases();
         console = new JLineCliConsole(System.in, System.out, getLog(), prompt);
 
-        buildCommands();
+        buildCliCommands();
         List<String> validCommandTokens = buildValidCommandTokens();
 
         ((JLineCliConsole) console).setCompletor(new CommandsCompletor(validCommandTokens));
@@ -62,14 +62,14 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
         compactWhiteSpacesInUserAliases();
     }
 
-    private void buildCommands() throws MojoExecutionException {
+    private void buildCliCommands() throws MojoExecutionException {
         cliCommands.add(new ExitCommand());
-        cliCommands.add(new ListProjectsCommand(modules.keySet(), console));
+        cliCommands.add(new ListProjectsCommand(modules.keySet()));
 
         PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
         PhaseCallRunner runner = new PhaseCallRunner(session, project, getLog());
 
-        cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner, console));
+        cliCommands.add(new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner));
     }
 
     private List<String> buildValidCommandTokens() {

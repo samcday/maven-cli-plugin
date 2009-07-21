@@ -3,6 +3,7 @@ package org.twdata.maven.cli.commands;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.twdata.maven.cli.console.CliConsole;
 
 public class ExitCommand implements Command {
     private final Set<String> exitCommands;
@@ -20,7 +21,7 @@ public class ExitCommand implements Command {
                 .describeCommandToken("quit, exit, bye", null);
     }
 
-    public boolean run(String request) {
+    public boolean run(String request, CliConsole console) {
         return false;
     }
 

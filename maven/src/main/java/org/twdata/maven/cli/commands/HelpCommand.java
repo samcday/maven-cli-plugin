@@ -9,11 +9,9 @@ import org.twdata.maven.cli.console.CliConsole;
 public class HelpCommand implements Command {
     private final Set<String> helpCommands;
     private final List<Command> availableCommands;
-    private final CliConsole console;
 
-    public HelpCommand(List<Command> availableCommands, CliConsole console) {
+    public HelpCommand(List<Command> availableCommands) {
         this.availableCommands = availableCommands;
-        this.console = console;
 
         HashSet<String> helpCommandTokens = new HashSet<String>();
         helpCommandTokens.add("help");
@@ -34,7 +32,7 @@ public class HelpCommand implements Command {
         return helpCommands.contains(request);
     }
 
-    public boolean run(String request) {
+    public boolean run(String request, CliConsole console) {
         CliConsoleCommandDescription description = new CliConsoleCommandDescription(console);
 
         for (Command command : availableCommands) {

@@ -57,7 +57,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     protected boolean interpretCommand(String request, CliConsole console) {
         for (Command command : cliCommands) {
             if (command.matchesRequest(request)) {
-                return command.run(request);
+                return command.run(request, console);
             }
         }
 

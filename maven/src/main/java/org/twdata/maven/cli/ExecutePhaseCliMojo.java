@@ -1,12 +1,10 @@
 package org.twdata.maven.cli;
 
 import org.twdata.maven.cli.commands.Command;
-import org.twdata.maven.cli.console.CliConsole;
 import java.util.HashMap;
 import java.util.Map;
 import org.twdata.maven.cli.commands.ExecutePhaseCommand;
 import org.twdata.maven.cli.commands.PhaseCallBuilder;
-import org.twdata.maven.cli.console.JLineCliConsole;
 
 /**
  * Provides an interactive command line interface for Maven plugins, allowing
@@ -24,10 +22,8 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
      */
     private Map<String, String> userAliases;
 
-    private CliConsole console;
-
     @Override
-    protected void beforeExecuteSetup() {
+    protected void beforeExecute() {
         resolveUserAliases();
     }
 
@@ -44,12 +40,6 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
             String value = userAliases.get(key).replaceAll("\\s{2,}", " ");
             userAliases.put(key, value);
         }
-    }
-
-    @Override
-    protected void afterExecuteSetup() {
-        console = new JLineCliConsole(System.in, System.out, getLog(), getCommandsCompletor(), prompt);
-        new CliShell(cliCommands, console).run();
     }
 
     @Override

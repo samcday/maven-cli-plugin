@@ -19,10 +19,15 @@ public class CliShell implements Runnable {
 
         String line;
         while ((line = console.readLine()) != null) {
-            if (StringUtils.isEmpty(line)) {
-                continue;
-            } else if (interpretCommand(line.trim().replaceAll(" {2,}", " ")) == false) {
-                break;
+            try {
+                if (StringUtils.isEmpty(line)) {
+                    continue;
+                } else if (interpretCommand(line.trim().replaceAll(" {2,}", " ")) == false) {
+                    break;
+                }
+            } catch (Exception ex) {
+                console.writeError("Unable to complete running command: " + line + "\n"
+                        + ex.toString());
             }
         }
     }

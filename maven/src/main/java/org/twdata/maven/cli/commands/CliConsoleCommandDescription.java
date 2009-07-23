@@ -43,7 +43,7 @@ public class CliConsoleCommandDescription implements CommandDescription {
         PrintWriter out = new PrintWriter(stringWriter);
 
         for (String token : tokenDescriptions.keySet()) {
-            out.printf(" %" + maxTokenLength + "s  %s%n", token, tokenDescriptions.get(token));
+            out.printf(" %-" + maxTokenLength + "s  %s%n", token, tokenDescriptions.get(token));
         }
 
         out.flush();

@@ -7,7 +7,7 @@ import org.twdata.maven.cli.console.CliConsole;
 
 public class CliConsoleCommandDescription implements CommandDescription {
     private final CliConsole console;
-    private final StringBuilder description = new StringBuilder("\n");
+    private final StringBuilder description = new StringBuilder();
     private final HashMap<String, String> tokenDescriptions = new HashMap<String, String>();
 
     public CliConsoleCommandDescription(CliConsole console) {
@@ -18,7 +18,7 @@ public class CliConsoleCommandDescription implements CommandDescription {
         if (!tokenDescriptions.isEmpty()) {
             flushTokenDescriptions();
         }
-        description.append(commandName).append(":\n");
+        description.append("\n").append(commandName).append(":\n");
         return this;
     }
 

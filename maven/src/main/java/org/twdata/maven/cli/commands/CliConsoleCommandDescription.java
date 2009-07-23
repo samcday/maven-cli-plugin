@@ -2,13 +2,13 @@ package org.twdata.maven.cli.commands;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.util.TreeMap;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class CliConsoleCommandDescription implements CommandDescription {
     private final CliConsole console;
     private final StringBuilder description = new StringBuilder();
-    private final HashMap<String, String> tokenDescriptions = new HashMap<String, String>();
+    private final TreeMap<String, String> tokenDescriptions = new TreeMap<String, String>();
 
     public CliConsoleCommandDescription(CliConsole console) {
         this.console = console;

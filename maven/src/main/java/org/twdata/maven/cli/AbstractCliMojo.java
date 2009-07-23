@@ -63,6 +63,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
 
     private boolean acceptSocket = true;
     private ServerSocket server = null;
+    private CommandsCompletor commandsCompletor;
 
     protected Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     protected List<Command> cliCommands = new ArrayList<Command>();
@@ -74,7 +75,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         beforeExecute();
         resolveModulesInProject();
         buildCommands();
-        buildValidCommandTokens();
+        buildCommandsCompletor();
 
         Thread consoleShell = displayConsoleCliShell();
         displaySocketCliShell();
@@ -98,6 +99,10 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         cliCommands.add(new ExitCommand());
         cliCommands.add(new ListProjectsCommand(modules.keySet()));
         cliCommands.add(new HelpCommand(cliCommands));
+    }
+
+    private void buildCommandsCompletor() {
+        commandsCompletor = new CommandsCompletor(buildValidCommandTokens());
     }
 
     private List<String> buildValidCommandTokens() {
@@ -144,13 +149,8 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         }
     }
 
-    protected Completor getCommandsCompletor() {
-        return new CommandsCompletor(buildValidCommandTokens());
-    }
-
     protected void displayShell(InputStream in, PrintStream out) {
-        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), getCommandsCompletor(),
-                prompt);
+        JLineCliConsole console = new JLineCliConsole(in, out, getLog(), commandsCompletor, prompt);
         new CliShell(cliCommands, console).run();
     }
 

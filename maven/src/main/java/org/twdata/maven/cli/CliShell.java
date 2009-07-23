@@ -5,7 +5,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.console.CliConsole;
 
-public class CliShell implements Runnable {
+public class CliShell {
     private final List<Command> commands;
     private final CliConsole console;
 

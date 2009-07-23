@@ -5,27 +5,25 @@ import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
+import org.twdata.maven.cli.console.CliConsole;
 
 public class PhaseCallRunner {
     private final MavenSession session;
     private final MavenProject project;
-    private final Log logger;
     private final File userDir;
     private boolean pluginExecutionOfflineMode;
 
-    public PhaseCallRunner(MavenSession session, MavenProject project, Log logger) {
+    public PhaseCallRunner(MavenSession session, MavenProject project) {
         this.session = session;
         this.project = project;
-        this.logger = logger;
         this.userDir = new File(System.getProperty("user.dir"));
         this.pluginExecutionOfflineMode = session.getSettings().isOffline();
     }
 
-    public void run(MavenProject currentProject, PhaseCall phaseCall) {
+    public void run(MavenProject currentProject, PhaseCall phaseCall, CliConsole console) {
         try {
             // QUESTION: which should it be?
             session.getExecutionProperties().putAll(phaseCall.getProperties());
@@ -47,9 +45,9 @@ public class PhaseCallRunner {
             }
             request.setPomFile(new File(currentProject.getBasedir(), "pom.xml").getPath());
             ((Maven) session.lookup(Maven.ROLE)).execute(request);
-            logger.info("Current project: " + project.getArtifactId());
+            console.writeInfo("Current project: " + project.getArtifactId());
         } catch (Exception e) {
-            logger.error("Failed to execute '" + phaseCall.getPhases() + "' on '"
+            console.writeError("Failed to execute '" + phaseCall.getPhases() + "' on '"
                     + currentProject.getArtifactId() + "'");
         }
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.maven.project.MavenProject;
+import org.twdata.maven.cli.console.CliConsole;
 
 public class PhaseCall {
     private final List<String> phases = new ArrayList<String>();
@@ -57,9 +58,9 @@ public class PhaseCall {
         recursive = false;
     }
 
-    public void run(PhaseCallRunner runner) {
+    public void run(PhaseCallRunner runner, CliConsole console) {
         for (MavenProject project : projects) {
-            runner.run(project, this);
+            runner.run(project, this, console);
         }
     }
 

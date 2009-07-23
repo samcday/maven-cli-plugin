@@ -25,6 +25,7 @@ public class ExecutePhaseCommand implements Command {
 
         SortedSet<String> set = new TreeSet<String>();
         set.add("clean");
+        set.add("compile");
         set.add("validate");
         set.add("generate-sources");
         set.add("generate-resources");
@@ -87,7 +88,7 @@ public class ExecutePhaseCommand implements Command {
             for (PhaseCall call : calls) {
                 console.writeDebug("Executing: " + call);
                 long start = System.currentTimeMillis();
-                call.run(runner);
+                call.run(runner, console);
                 long now = System.currentTimeMillis();
                 console.writeInfo("Execution time: " + (now - start) + " ms");
             }

@@ -20,18 +20,10 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
      *
      * @parameter
      */
-    private Map<String, String> userAliases;
+    private Map<String, String> userAliases = new HashMap<String, String>();
 
     @Override
     protected void beforeExecute() {
-        resolveUserAliases();
-    }
-
-    private void resolveUserAliases() {
-        if (userAliases == null) {
-            userAliases = new HashMap<String, String>();
-        }
-
         compactWhiteSpacesInUserAliases();
     }
 

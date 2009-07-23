@@ -18,7 +18,7 @@ public class JLineCliConsole implements CliConsole {
         try {
             consoleReader = new ConsoleReader(in, new OutputStreamWriter(out));
             consoleReader.setBellEnabled(false);
-            consoleReader.setDefaultPrompt((prompt != null ? prompt : "maven2") + "> ");
+            consoleReader.setDefaultPrompt(prompt + "> ");
             this.logger = logger;
             consoleReader.addCompletor(completor);
         } catch (IOException ex) {

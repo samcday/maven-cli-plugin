@@ -51,7 +51,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String prompt;
+    private String prompt = "maven2";
 
     /**
      * TCP port to listen to for shell access
@@ -144,7 +144,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         new CliShell(cliCommands, console).run();
     }
 
-    protected void openSocket(ServerSocket server, int port) {
+    private void openSocket(ServerSocket server, int port) {
         getLog().info("Opening port " + port + " for socket cli access");
         while (acceptSocket) {
             Socket connection = null;

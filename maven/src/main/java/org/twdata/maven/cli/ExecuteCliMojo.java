@@ -20,7 +20,7 @@ public class ExecuteCliMojo extends AbstractCliMojo {
      *
      * @parameter
      */
-    private Map<String, String> commands;
+    private Map<String, String> commands = new HashMap<String, String>();
 
     /**
      * The Maven PluginManager Object
@@ -32,17 +32,11 @@ public class ExecuteCliMojo extends AbstractCliMojo {
 
     @Override
     protected void beforeExecute() {
-        resolveUserDefinedGoals();
+        // do nothing
     }
 
     @Override
     protected Command getSpecializedCliMojoCommand() {
         return new ExecuteGoalCommand(project, session, pluginManager, commands);
-    }
-
-    private void resolveUserDefinedGoals() {
-        if (commands == null) {
-            commands = new HashMap<String, String>();
-        }
     }
 }

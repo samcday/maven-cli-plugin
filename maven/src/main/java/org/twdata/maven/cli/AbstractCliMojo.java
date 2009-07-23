@@ -80,8 +80,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         displaySocketCliShell();
         try {
             consoleShell.join();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             // ignore
         }
     }
@@ -119,8 +118,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
                     if (server != null) {
                         server.close();
                     }
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -134,15 +132,14 @@ public abstract class AbstractCliMojo extends AbstractMojo {
         if (port != null) {
             try {
                 server = new ServerSocket(Integer.parseInt(port));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 getLog().error("Cannot open port " + port + " for cli server: " + e);
             }
             openSocket(server, Integer.parseInt(port));
         }
     }
 
-    protected void displayShell(InputStream in, PrintStream out) {
+    private void displayShell(InputStream in, PrintStream out) {
         JLineCliConsole console = new JLineCliConsole(in, out, getLog(), commandsCompletor, prompt);
         new CliShell(cliCommands, console).run();
     }
@@ -154,18 +151,15 @@ public abstract class AbstractCliMojo extends AbstractMojo {
             try {
                 connection = server.accept();
                 displayShell(connection.getInputStream(), new PrintStream(connection.getOutputStream()));
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 getLog().error("Server quit unexpectedly");
                 ex.printStackTrace();
-
             }
             finally {
                 if (connection != null) {
                     try {
                         connection.close();
-                    }
-                    catch (IOException e) {
+                    } catch (IOException e) {
                         // we really don't care
                     }
                 }

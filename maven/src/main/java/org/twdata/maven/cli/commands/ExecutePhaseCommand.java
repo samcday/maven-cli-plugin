@@ -1,7 +1,6 @@
 package org.twdata.maven.cli.commands;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -15,7 +14,7 @@ public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;
     private final PhaseCallBuilder commandCallBuilder;
     private final PhaseCallRunner runner;
-    private final SortedSet<String> phasesAndProperties;
+    private final SortedSet<String> phasesAndProperties = new TreeSet<String>();
 
     public ExecutePhaseCommand(Set<String> modules, PhaseCallBuilder commandCallBuilder,
             PhaseCallRunner runner) {
@@ -23,24 +22,22 @@ public class ExecutePhaseCommand implements Command {
         this.commandCallBuilder = commandCallBuilder;
         this.runner = runner;
 
-        SortedSet<String> set = new TreeSet<String>();
-        set.add("clean");
-        set.add("compile");
-        set.add("validate");
-        set.add("generate-sources");
-        set.add("generate-resources");
-        set.add("test-compile");
-        set.add("test");
-        set.add("package");
-        set.add("integration-test");
-        set.add("install");
-        set.add("deploy");
-        set.add("site");
-        set.add("site-deploy");
-        set.add("-o"); // offline mode
-        set.add("-N"); // don't recurse
-        set.add("-S"); // skip tests
-        phasesAndProperties = Collections.unmodifiableSortedSet(set);
+        phasesAndProperties.add("clean");
+        phasesAndProperties.add("compile");
+        phasesAndProperties.add("validate");
+        phasesAndProperties.add("generate-sources");
+        phasesAndProperties.add("generate-resources");
+        phasesAndProperties.add("test-compile");
+        phasesAndProperties.add("test");
+        phasesAndProperties.add("package");
+        phasesAndProperties.add("integration-test");
+        phasesAndProperties.add("install");
+        phasesAndProperties.add("deploy");
+        phasesAndProperties.add("site");
+        phasesAndProperties.add("site-deploy");
+        phasesAndProperties.add("-o"); // offline mode
+        phasesAndProperties.add("-N"); // don't recurse
+        phasesAndProperties.add("-S"); // skip tests
     }
 
     public void describe(CommandDescription description) {

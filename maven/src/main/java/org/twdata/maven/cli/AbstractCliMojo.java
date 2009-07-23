@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jline.Completor;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -102,18 +101,12 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     }
 
     private void buildCommandsCompletor() {
-        commandsCompletor = new CommandsCompletor(buildValidCommandTokens());
-    }
-
-    private List<String> buildValidCommandTokens() {
         CommandTokenCollector collector = new CommandTokenCollector();
         for (Command command : cliCommands) {
             command.collectCommandTokens(collector);
         }
 
-        List<String> availableCommands = new ArrayList<String>();
-        availableCommands.addAll(collector.getCollectedTokens());
-        return availableCommands;
+        commandsCompletor = new CommandsCompletor(collector.getCollectedTokens());
     }
 
     private Thread displayConsoleCliShell() {

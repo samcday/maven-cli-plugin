@@ -1,29 +1,12 @@
 package org.twdata.maven.cli;
 
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
-
-import java.io.*;
-import java.util.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-
-import jline.ConsoleReader;
-
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Installs an IDEA plugin that sends commands to a listening CLI port
@@ -37,14 +20,10 @@ public class IdeaMojo extends AbstractMojo {
     private static final String MAVEN_CLI_JAR = "maven-cli-idea-plugin.jar";
 
     public void execute() throws MojoExecutionException {
-
-
         File pluginsDir = determinePluginsDirViaIdeaPlugins();
-        if (pluginsDir == null)
-        {
+        if (pluginsDir == null) {
             pluginsDir = determinePluginsDirViaIdeaHome();
-            if (pluginsDir == null)
-            {
+            if (pluginsDir == null) {
                 pluginsDir = determinePluginsViaDefaults();
             }
         }
@@ -87,8 +66,7 @@ public class IdeaMojo extends AbstractMojo {
         getLog().info("IDEA plugin installed");
     }
 
-    File determinePluginsDirViaIdeaHome() throws MojoExecutionException
-    {
+    private File determinePluginsDirViaIdeaHome() throws MojoExecutionException {
         String path = System.getProperty("idea.home");
         if (path == null) {
             return null;
@@ -109,8 +87,7 @@ public class IdeaMojo extends AbstractMojo {
         return pluginsDir;
     }
 
-    File determinePluginsDirViaIdeaPlugins() throws MojoExecutionException
-    {
+    private File determinePluginsDirViaIdeaPlugins() throws MojoExecutionException {
         String path = System.getProperty("idea.plugins");
         if (path == null) {
             return null;
@@ -122,19 +99,16 @@ public class IdeaMojo extends AbstractMojo {
         return pluginsDir;
     }
 
-    File determinePluginsViaDefaults()
-    {
+    private File determinePluginsViaDefaults() {
         String[] paths = new String[] {
                 System.getProperty("user.home") + "/.IntelliJIdea80/config/plugins",
                 System.getProperty("user.home") + "/Library/Application Support/IntelliJIDEA80"
         };
 
-        for (String path : paths)
-        {
+        for (String path : paths) {
             String conv = path.replace('/', File.separatorChar);
             File pluginsDir = new File(conv);
-            if (pluginsDir.exists())
-            {
+            if (pluginsDir.exists()) {
                 return pluginsDir;
             }
         }

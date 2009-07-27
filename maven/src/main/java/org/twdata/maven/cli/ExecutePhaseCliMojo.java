@@ -36,10 +36,11 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
 
     @Override
     protected Command getSpecializedCliMojoCommand() {
-        PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
+        PhaseCallBuilder phaseCallBuilder =
+                new PhaseCallBuilder(project, modules, userAliases);
         PhaseCallRunner runner = new PhaseCallRunner(session, project);
 
-        return new ExecutePhaseCommand(userAliases.keySet(), modules.keySet(), commandCallBuilder,
-                runner);
+        return new ExecutePhaseCommand(userAliases.keySet(), modules.keySet(),
+                phaseCallBuilder, runner);
     }
 }

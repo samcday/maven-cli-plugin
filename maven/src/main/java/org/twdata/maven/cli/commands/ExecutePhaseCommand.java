@@ -15,9 +15,11 @@ public class ExecutePhaseCommand implements Command {
     private final PhaseCallBuilder commandCallBuilder;
     private final PhaseCallRunner runner;
     private final SortedSet<String> phasesAndProperties = new TreeSet<String>();
+    private final Set<String> userAliases;
 
-    public ExecutePhaseCommand(Set<String> modules, PhaseCallBuilder commandCallBuilder,
-            PhaseCallRunner runner) {
+    public ExecutePhaseCommand(Set<String> userAliases, Set<String> modules,
+            PhaseCallBuilder commandCallBuilder, PhaseCallRunner runner) {
+        this.userAliases = userAliases;
         this.modules = modules;
         this.commandCallBuilder = commandCallBuilder;
         this.runner = runner;
@@ -48,17 +50,23 @@ public class ExecutePhaseCommand implements Command {
                 description.describeCommandToken(phase, null);
             }
         }
+
+        for (String userAlias : userAliases) {
+            description.describeCommandToken(userAlias, null);
+        }
     }
 
     public void collectCommandTokens(CommandTokenCollector collector) {
         collector.addCommandTokens(phasesAndProperties);
         collector.addCommandTokens(modules);
+        collector.addCommandTokens(userAliases);
     }
 
     public boolean matchesRequest(String request) {
         for (String token : request.split(" ")) {
             if (!phasesAndProperties.contains(token) && !token.startsWith("-D")
-                    && !token.startsWith("-P") && !matchesModules(token)) {
+                    && !token.startsWith("-P") && !userAliases.contains(token)
+                    && !matchesModules(token)) {
                 return false;
             }
         }

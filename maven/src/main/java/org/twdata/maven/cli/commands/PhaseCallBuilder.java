@@ -58,7 +58,7 @@ public class PhaseCallBuilder {
     private List<String> resolveUserAliases(String text) {
         List<String> result = new ArrayList<String>();
 
-        for (String token : text.split(" ")) {
+        for (String token : text.split("\\s")) {
             if (userAliases.containsKey(token)) {
                 result.addAll(resolveUserAliases(userAliases.get(token)));
             } else if (!StringUtils.isEmpty(token)) {
@@ -131,7 +131,7 @@ public class PhaseCallBuilder {
         String key = property;
         String value = "1";
         if (property.indexOf("=") >= 0) {
-            String[] propertyTokens = property.split("=");
+            String[] propertyTokens = property.split("=", 2);
             key = propertyTokens[0];
             if (propertyTokens.length > 1) {
                 value = propertyTokens[1];

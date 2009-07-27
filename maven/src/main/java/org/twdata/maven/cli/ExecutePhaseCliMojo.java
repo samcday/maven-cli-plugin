@@ -39,6 +39,7 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
         PhaseCallBuilder commandCallBuilder = new PhaseCallBuilder(project, modules, userAliases);
         PhaseCallRunner runner = new PhaseCallRunner(session, project);
 
-        return new ExecutePhaseCommand(modules.keySet(), commandCallBuilder, runner);
+        return new ExecutePhaseCommand(userAliases.keySet(), modules.keySet(), commandCallBuilder,
+                runner);
     }
 }

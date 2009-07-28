@@ -11,10 +11,11 @@ import org.junit.runner.RunWith;
 public class ExecutePhaseCommandSpec extends Specification<Void> {
     public class WhenRunningRequests {
         private Set<String> modules = new HashSet<String>();
+        private Set<String> userAliases = new HashSet<String>();
         private PhaseCallBuilder mockBuilder = mock(PhaseCallBuilder.class);
         private PhaseCallRunner mockRunner = mock(PhaseCallRunner.class);
         private ExecutePhaseCommand command =
-                new ExecutePhaseCommand(modules, mockBuilder, mockRunner);
+                new ExecutePhaseCommand(userAliases, modules, mockBuilder, mockRunner);
 
         public void shouldNotMatchRequestIfAnyTheTokensIsInvalid() {
             specify(command.matchesRequest("-o build"), should.equal(false));
@@ -26,6 +27,11 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
 
         public void shouldNotRejectProfileInput() {
             specify(command.matchesRequest("-Pprofile"), should.equal(true));
+        }
+
+        public void shouldNotRejectUserAliasesInput() {
+            userAliases.add("alias");
+            specify(command.matchesRequest("alias"), should.equal(true));
         }
 
         public void shouldNotRejectIfMatchesModuleWildCardInput() {

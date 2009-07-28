@@ -12,14 +12,16 @@ import org.twdata.maven.cli.PhaseCallRunner;
 
 public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;
-    private final PhaseCallBuilder commandCallBuilder;
+    private final PhaseCallBuilder phaseCallBuilder;
     private final PhaseCallRunner runner;
     private final SortedSet<String> phasesAndProperties = new TreeSet<String>();
+    private final Set<String> userAliases;
 
-    public ExecutePhaseCommand(Set<String> modules, PhaseCallBuilder commandCallBuilder,
-            PhaseCallRunner runner) {
+    public ExecutePhaseCommand(Set<String> userAliases, Set<String> modules,
+            PhaseCallBuilder phaseCallBuilder, PhaseCallRunner runner) {
+        this.userAliases = userAliases;
         this.modules = modules;
-        this.commandCallBuilder = commandCallBuilder;
+        this.phaseCallBuilder = phaseCallBuilder;
         this.runner = runner;
 
         phasesAndProperties.add("clean");
@@ -48,17 +50,23 @@ public class ExecutePhaseCommand implements Command {
                 description.describeCommandToken(phase, null);
             }
         }
+
+        for (String userAlias : userAliases) {
+            description.describeCommandToken(userAlias, null);
+        }
     }
 
     public void collectCommandTokens(CommandTokenCollector collector) {
         collector.addCommandTokens(phasesAndProperties);
         collector.addCommandTokens(modules);
+        collector.addCommandTokens(userAliases);
     }
 
     public boolean matchesRequest(String request) {
         for (String token : request.split(" ")) {
             if (!phasesAndProperties.contains(token) && !token.startsWith("-D")
-                    && !token.startsWith("-P") && !matchesModules(token)) {
+                    && !token.startsWith("-P") && !userAliases.contains(token)
+                    && !matchesModules(token)) {
                 return false;
             }
         }
@@ -80,7 +88,7 @@ public class ExecutePhaseCommand implements Command {
     public boolean run(String request, CliConsole console) {
         try {
             List<PhaseCall> calls = new ArrayList<PhaseCall>();
-            calls = commandCallBuilder.parseCommand(request);
+            calls = phaseCallBuilder.parseCommand(request);
 
             for (PhaseCall call : calls) {
                 console.writeDebug("Executing: " + call);

@@ -66,7 +66,7 @@ public class ExecutePhaseCommand implements Command {
         for (String token : request.split(" ")) {
             if (!phasesAndProperties.contains(token) && !token.startsWith("-D")
                     && !token.startsWith("-P") && !userAliases.contains(token)
-                    && !matchesModules(token)) {
+                    && !matchesModules(token) && isInvalidPluginGoalCommand(token)) {
                 return false;
             }
         }
@@ -78,6 +78,21 @@ public class ExecutePhaseCommand implements Command {
         String regex = token.replaceAll("\\*", ".*").replaceAll("\\?", "\\\\?");
         for (String module : modules) {
             if (module.matches(regex)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isInvalidPluginGoalCommand(String token) {
+        String[] goalConstruct = token.split(":");
+        if (goalConstruct.length != 2 && goalConstruct.length != 3) {
+            return true;
+        }
+
+        for (String construct : goalConstruct) {
+            if ("".equals(construct)) {
                 return true;
             }
         }

@@ -43,5 +43,25 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
             modules.add("module");
             command.matchesRequest("?");
         }
+
+        public void shouldNotRejectPluginGoalsWithExplicitGroupId() {
+            specify(command.matchesRequest("groupId:pluginId:goal"), should.equal(true));
+        }
+
+        public void shouldNotRejectPluginGoalsWithNoExplicitGroupId() {
+            specify(command.matchesRequest("pluginId:goal"), should.equal(true));
+        }
+
+        public void shouldRejectPluginGoalsWithNoExplicitGroupIdAndPluginId() {
+            specify(command.matchesRequest(":goal"), should.equal(false));
+        }
+
+        public void shouldRejectPluginGoalsWithNoExplicitGroupIdAndGoal() {
+            specify(command.matchesRequest("pluginId:"), should.equal(false));
+        }
+
+        public void shouldRejectPluginGoalsWithNoExplicitGroupIdAndPluginAndGoal() {
+            specify(command.matchesRequest("::"), should.equal(false));
+        }
     }
 }

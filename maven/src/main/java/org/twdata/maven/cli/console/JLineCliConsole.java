@@ -26,7 +26,6 @@ public class JLineCliConsole implements CliConsole {
         }
     }
 
-    @Override
     public String readLine() {
         try {
             return consoleReader.readLine();

@@ -1,5 +1,7 @@
 package org.twdata.maven.cli;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
@@ -26,8 +28,10 @@ public class CliShell {
                     break;
                 }
             } catch (Exception ex) {
+                StringWriter exMsg = new StringWriter();
+                ex.printStackTrace(new PrintWriter(exMsg));
                 console.writeError("Unable to complete running command: " + line + "\n"
-                        + ex.toString());
+                        + exMsg.toString());
             }
         }
     }

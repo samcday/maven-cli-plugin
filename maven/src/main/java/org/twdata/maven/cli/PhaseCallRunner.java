@@ -23,7 +23,7 @@ public class PhaseCallRunner {
         this.pluginExecutionOfflineMode = session.getSettings().isOffline();
     }
 
-    public void run(MavenProject currentProject, PhaseCall phaseCall, CliConsole console) {
+    public boolean run(MavenProject currentProject, PhaseCall phaseCall, CliConsole console) {
         try {
             // QUESTION: which should it be?
             session.getExecutionProperties().putAll(phaseCall.getProperties());
@@ -46,9 +46,11 @@ public class PhaseCallRunner {
             request.setPomFile(new File(currentProject.getBasedir(), "pom.xml").getPath());
             ((Maven) session.lookup(Maven.ROLE)).execute(request);
             console.writeInfo("Current project: " + project.getArtifactId());
+            return true;
         } catch (Exception e) {
             console.writeError("Failed to execute '" + phaseCall.getPhases() + "' on '"
                     + currentProject.getArtifactId() + "'");
+            return false;
         }
     }
 }

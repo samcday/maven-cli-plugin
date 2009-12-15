@@ -3,7 +3,7 @@ package org.twdata.maven.cli;
 import org.apache.maven.project.MavenProject;
 
 public class PhaseCallTestDataBuilder {
-    private PhaseCall phaseCall = new PhaseCall();
+    private PhaseCall phaseCall = new PhaseCall(false);
 
     public PhaseCallTestDataBuilder hasPhases(String... phases) {
         for (String phase : phases) {

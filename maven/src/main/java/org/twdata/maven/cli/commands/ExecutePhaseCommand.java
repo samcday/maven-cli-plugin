@@ -16,13 +16,15 @@ public class ExecutePhaseCommand implements Command {
     private final PhaseCallRunner runner;
     private final SortedSet<String> phasesAndProperties = new TreeSet<String>();
     private final Set<String> userAliases;
+    private final boolean ignoreFailures;
 
     public ExecutePhaseCommand(Set<String> userAliases, Set<String> modules,
-            PhaseCallBuilder phaseCallBuilder, PhaseCallRunner runner) {
+        PhaseCallBuilder phaseCallBuilder, PhaseCallRunner runner, boolean ignoreFailures) {
         this.userAliases = userAliases;
         this.modules = modules;
         this.phaseCallBuilder = phaseCallBuilder;
         this.runner = runner;
+        this.ignoreFailures = ignoreFailures;
 
         phasesAndProperties.add("clean");
         phasesAndProperties.add("compile");
@@ -108,9 +110,13 @@ public class ExecutePhaseCommand implements Command {
             for (PhaseCall call : calls) {
                 console.writeDebug("Executing: " + call);
                 long start = System.currentTimeMillis();
-                call.run(runner, console);
+                boolean success = call.run(runner, console);
                 long now = System.currentTimeMillis();
                 console.writeInfo("Execution time: " + (now - start) + " ms");
+                if (!(ignoreFailures || success))
+                {
+                    break;
+                }
             }
         } catch (IllegalArgumentException ex) {
             console.writeError("Invalid command: " + request);

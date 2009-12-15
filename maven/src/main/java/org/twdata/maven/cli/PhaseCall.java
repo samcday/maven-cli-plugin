@@ -7,12 +7,19 @@ import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class PhaseCall {
+    private final boolean ignoreFailures;
+
     private final List<String> phases = new ArrayList<String>();
     private final List<String> profiles = new ArrayList<String>();
     private final List<MavenProject> projects = new ArrayList<MavenProject>();
     private final Properties properties = new Properties();
     private boolean offline = false;
     private boolean recursive = true;
+
+    public PhaseCall(boolean ignoreFailures)
+    {
+        this.ignoreFailures = ignoreFailures;
+    }
 
     public void addProject(MavenProject project) {
         projects.add(project);
@@ -58,10 +65,15 @@ public class PhaseCall {
         recursive = false;
     }
 
-    public void run(PhaseCallRunner runner, CliConsole console) {
+    public boolean run(PhaseCallRunner runner, CliConsole console) {
         for (MavenProject project : projects) {
-            runner.run(project, this, console);
+            boolean success = runner.run(project, this, console);
+            if (!(ignoreFailures || success))
+            {
+                return false;
+            }
         }
+        return true;
     }
 
     @Override

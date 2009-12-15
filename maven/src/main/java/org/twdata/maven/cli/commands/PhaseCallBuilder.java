@@ -12,12 +12,14 @@ public class PhaseCallBuilder {
     private final MavenProject defaultProject;
     private final Map<String, MavenProject> modules;
     private final Map<String, String> userAliases;
+    private final boolean ignoreFailures;
 
     public PhaseCallBuilder(MavenProject project, Map<String, MavenProject> modules,
-            Map<String, String> userAliases) {
+        Map<String, String> userAliases, boolean ignoreFailures) {
         defaultProject = project;
         this.modules = modules;
         this.userAliases = userAliases;
+        this.ignoreFailures = ignoreFailures;
     }
 
     public List<PhaseCall> parseCommand(String text) {
@@ -71,7 +73,7 @@ public class PhaseCallBuilder {
 
     private PhaseCall addProject(List<PhaseCall> phases, PhaseCall currentPhaseCall, MavenProject project) {
         if (currentPhaseCall == null || !currentPhaseCall.getPhases().isEmpty()) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             phases.add(currentPhaseCall);
         }
         currentPhaseCall.addProject(project);
@@ -80,7 +82,7 @@ public class PhaseCallBuilder {
 
     private PhaseCall addPhase(List<PhaseCall> phases, PhaseCall currentPhaseCall, String phase) {
         if (currentPhaseCall == null) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             currentPhaseCall.addProject(defaultProject);
             phases.add(currentPhaseCall);
         }
@@ -90,7 +92,7 @@ public class PhaseCallBuilder {
 
     private void disableRecursive(List<PhaseCall> phases, PhaseCall currentPhaseCall) {
         if (currentPhaseCall == null) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             phases.add(currentPhaseCall);
         }
         currentPhaseCall.doNotRecurse();
@@ -98,7 +100,7 @@ public class PhaseCallBuilder {
 
     private void goOffline(List<PhaseCall> phases, PhaseCall currentPhaseCall) {
         if (currentPhaseCall == null) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             phases.add(currentPhaseCall);
         }
         currentPhaseCall.goOffline();
@@ -110,7 +112,7 @@ public class PhaseCallBuilder {
         }
 
         if (currentPhaseCall == null) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             phases.add(currentPhaseCall);
         }
 
@@ -124,7 +126,7 @@ public class PhaseCallBuilder {
         }
 
         if (currentPhaseCall == null) {
-            currentPhaseCall = new PhaseCall();
+            currentPhaseCall = new PhaseCall(ignoreFailures);
             phases.add(currentPhaseCall);
         }
         property = property.substring(2);

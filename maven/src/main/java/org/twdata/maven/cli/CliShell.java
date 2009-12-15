@@ -18,9 +18,11 @@ public class CliShell {
 
     public void run() {
         console.writeInfo("Waiting for commands...");
+        CtrlCSignalHandler ctrlCSignalHandler = new CtrlCSignalHandler();
 
         String line;
         while ((line = console.readLine()) != null) {
+            ctrlCSignalHandler.startSupervising();
             try {
                 if (StringUtils.isEmpty(line)) {
                     continue;
@@ -33,12 +35,16 @@ public class CliShell {
                 console.writeError("Unable to complete running command: " + line + "\n"
                         + exMsg.toString());
             }
+            finally {
+                ctrlCSignalHandler.stopSupervising();
+            }
         }
     }
 
     private boolean interpretCommand(String request) {
         for (Command command : commands) {
             if (command.matchesRequest(request)) {
+
                 return command.run(request, console);
             }
         }

@@ -1,1 +1,7 @@
-This is my readme
+1.0.1
+* Denoting the stability and maturity reached that equates to a 1.0 version
+* Upgraded all 3P dependencies to latest released versions
+
+0.8.1
+* Merging in JRopers changes to add an option flag for proceeding/stopping on failures on intermediate modules during compilation
+* Merging in JRopers changes to add a Ctrl-C handler

@@ -6,6 +6,42 @@
     <version>0.8.1-SNAPSHOT</version>
     <name>Maven CLI Plugin Parent</name>
     <url>http://github.com/mrdon/maven-cli-plugin/wikis</url>
+    
+    <developers>
+      <developer>
+        <id>mrdon</id>
+        <name>Don Brown</name>
+        <email>mrdon@apache.org</email>
+        <organization>Atlassian</organization>
+      </developer>
+      <developer>
+        <id>matthewmccullough</id>
+        <name>Matthew McCullough</name>
+        <email>matthewm@ambientideas.com</email>
+        <organization>Ambient Ideas, LLC</organization>
+      </developer>
+      <developer>
+        <id>jroper</id>
+        <name>James Roper</name>
+        <email>mrdon@apache.org</email>
+        <organization>Atlassian</organization>
+      </developer>
+      <developer>
+        <id>shaolang</id>
+        <name>Shao Lang</name>
+        <email>XX</email>
+        <organization>XX</organization>
+      </developer>
+    </developers>
+    <contributors>
+      <contributor>
+        <name>mojavelinux</name>
+      </contributor>
+      <contributor>
+        <name>shaolang</name>
+      </contributor>
+    </contributors>
+    
     <modules>
         <module>maven</module>
     </modules>

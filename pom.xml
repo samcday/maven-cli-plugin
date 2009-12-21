@@ -15,30 +15,34 @@
         <organization>Atlassian</organization>
       </developer>
       <developer>
+        <id>shaolang</id>
+        <name>Shao Lang</name>
+        <email>shaolang@ymail.com</email>
+        <organization></organization>
+        <roles>
+          <role>Refactoring</role>
+          <role>Unit Test Coder</role>
+        </roles>
+      </developer>
+      <developer>
+        <id>jroper</id>
+        <name>James Roper</name>
+        <organization>Atlassian</organization>
+      </developer>
+      <developer>
         <id>matthewmccullough</id>
         <name>Matthew McCullough</name>
         <email>matthewm@ambientideas.com</email>
         <organization>Ambient Ideas, LLC</organization>
       </developer>
-      <developer>
-        <id>jroper</id>
-        <name>James Roper</name>
-        <email>mrdon@apache.org</email>
-        <organization>Atlassian</organization>
-      </developer>
-      <developer>
-        <id>shaolang</id>
-        <name>Shao Lang</name>
-        <email>XX</email>
-        <organization>XX</organization>
-      </developer>
     </developers>
     <contributors>
       <contributor>
-        <name>mojavelinux</name>
+        <name>Dan Allen (mojavelinux)</name>
+        <email>dan.allen@mojavelinux.com</email>
       </contributor>
       <contributor>
-        <name>shaolang</name>
+        <name>Vincent Beretti</name>
       </contributor>
     </contributors>
     

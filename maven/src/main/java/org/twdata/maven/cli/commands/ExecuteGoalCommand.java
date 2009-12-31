@@ -6,10 +6,13 @@ import java.util.Map;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.MojoCall;
 import org.twdata.maven.cli.console.CliConsole;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public class ExecuteGoalCommand implements Command {
     private final Map<String, String> defaultGoals = Collections
@@ -59,13 +62,15 @@ public class ExecuteGoalCommand implements Command {
     private final MavenProject project;
     private final MavenSession session;
     private final PluginManager pluginManager;
+    private final MavenPluginManager mavenPluginManager;
 
     public ExecuteGoalCommand(MavenProject project, MavenSession session,
-            PluginManager pluginManager, Map<String, String> userDefinedAliases) {
+            PluginManager pluginManager, Map<String, String> userDefinedAliases, MavenPluginManager mavenPluginManager) {
         this.project = project;
         this.session = session;
         this.pluginManager = pluginManager;
         this.userDefinedAliases = userDefinedAliases;
+        this.mavenPluginManager = mavenPluginManager;
     }
 
     public void describe(CommandDescription description) {
@@ -97,7 +102,7 @@ public class ExecuteGoalCommand implements Command {
         return true;
     }
 
-    public boolean run(String request, CliConsole console) {
+    public boolean run(String request, CliConsole console) throws MojoFailureException, ComponentLookupException {
         for (String token : request.split(" ")) {
             try {
                 if (defaultGoals.containsKey(token)) {
@@ -115,9 +120,9 @@ public class ExecuteGoalCommand implements Command {
         return true;
     }
 
-    private void runMojo(String mojoString, CliConsole console) throws MojoExecutionException {
+    private void runMojo(String mojoString, CliConsole console) throws MojoExecutionException, MojoFailureException, ComponentLookupException {
         String[] mojoInfo = mojoString.split(":");
-        MojoCall call = new MojoCall(mojoInfo[0], mojoInfo[1], mojoInfo[2]);
+        MojoCall call = new MojoCall(mojoInfo[0], mojoInfo[1], mojoInfo[2], mavenPluginManager);
 
         console.writeInfo("Executing: " + call);
         long start = System.currentTimeMillis();

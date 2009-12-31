@@ -14,7 +14,7 @@ public class ExecuteGoalCommandSpec extends Specification<Void> {
             HashMap<String, String> userDefinedGoal = new HashMap<String, String>();
             userDefinedGoal.put("all", "clean compile test");
 
-            command = new ExecuteGoalCommand(null, null, null, userDefinedGoal);
+            command = new ExecuteGoalCommand(null, null, null, userDefinedGoal, null);
         }
 
         public void shouldMatchWhenSpecifiedRequestIsOneOfThePredefinedGoals() {

@@ -37,6 +37,6 @@ public class ExecuteCliMojo extends AbstractCliMojo {
 
     @Override
     protected Command getSpecializedCliMojoCommand() {
-        return new ExecuteGoalCommand(project, session, pluginManager, commands);
+        return new ExecuteGoalCommand(project, session, pluginManager, commands, mavenPluginManager);
     }
 }

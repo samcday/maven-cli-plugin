@@ -2,6 +2,8 @@ package org.twdata.maven.cli.commands;
 
 import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.console.CliConsole;
+import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public interface Command {
     void describe(CommandDescription description);
@@ -22,5 +24,5 @@ public interface Command {
      * @return false if the command wants to end the mojo after it finish
      * running run().
      */
-    public boolean run(String request, CliConsole console);
+    public boolean run(String request, CliConsole console) throws MojoFailureException, ComponentLookupException;
 }

@@ -4,8 +4,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.console.CliConsole;
+import org.apache.maven.plugin.MojoFailureException;
 
 public class CliShell {
     private final List<Command> commands;
@@ -36,7 +38,7 @@ public class CliShell {
         }
     }
 
-    private boolean interpretCommand(String request) {
+    private boolean interpretCommand(String request) throws MojoFailureException, ComponentLookupException {
         for (Command command : commands) {
             if (command.matchesRequest(request)) {
                 return command.run(request, console);

@@ -7,6 +7,8 @@ import org.jmock.Expectations;
 import org.junit.runner.RunWith;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.console.CliConsole;
+import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 @RunWith(JDaveRunner.class)
 public class CliShellSpec extends Specification<Void> {
@@ -19,7 +21,7 @@ public class CliShellSpec extends Specification<Void> {
             commands.add(mockCommand);
         }
 
-        public void shouldNotExitLoopIfTheCommandRaisesException() {
+        public void shouldNotExitLoopIfTheCommandRaisesException() throws MojoFailureException, ComponentLookupException {
             CliShell shell = new CliShell(commands, mockConsole);
 
             checking(new Expectations() {{

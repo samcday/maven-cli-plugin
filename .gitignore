@@ -5,3 +5,6 @@ target
 *.iws
 release.properties
 *.xml.releaseBackup
+**/.classpath
+**/.project
+**/.settings

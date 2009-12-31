@@ -12,14 +12,26 @@ import java.util.Map;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.HelpCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.JLineCliConsole;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 
 public abstract class AbstractCliMojo extends AbstractMojo {
+    /**
+     * @component
+     * @required
+     */
+    protected MavenPluginManager mavenPluginManager;
+
     /**
      * The Maven Project Object
      *

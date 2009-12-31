@@ -5,34 +5,42 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProject;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.executionEnvironment;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.goal;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.groupId;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.plugin;
-import static org.twdata.maven.mojoexecutor.MojoExecutor.version;
+import static org.twdata.maven.cli.MojoExecutor.artifactId;
+import static org.twdata.maven.cli.MojoExecutor.configuration;
+import static org.twdata.maven.cli.MojoExecutor.executeMojo;
+import static org.twdata.maven.cli.MojoExecutor.executionEnvironment;
+import static org.twdata.maven.cli.MojoExecutor.goal;
+import static org.twdata.maven.cli.MojoExecutor.groupId;
+import static org.twdata.maven.cli.MojoExecutor.plugin;
+import static org.twdata.maven.cli.MojoExecutor.version;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.annotations.Component;
 
 public class MojoCall {
-    private final String groupId;
-    private final String artifactId;
-    private final String goal;
+    private String groupId;
+    private String artifactId;
+    private String goal;
+    private MavenPluginManager mavenPluginManager;
 
-    public MojoCall(String groupId, String artifactId, String goal) {
+    public MojoCall(String groupId, String artifactId, String goal, MavenPluginManager mavenPluginManager) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.goal = goal;
+        this.mavenPluginManager = mavenPluginManager;
     }
 
     public void run(MavenProject project, MavenSession session, PluginManager pluginManager)
             throws MojoExecutionException {
+//      MojoExecutionException mojoDescriptor = new MojoDescriptor();
+//      MojoExecution execution = new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
+//      pluginManager.executeMojo(project, execution, session);
         executeMojo(
                 plugin(groupId(groupId), artifactId(artifactId), version(getVersion(project))),
                 goal(goal),
                 configuration(),
-                executionEnvironment(project, session, pluginManager));
+                executionEnvironment(project, session, pluginManager), mavenPluginManager);
     }
 
     /**

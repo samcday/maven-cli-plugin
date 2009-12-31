@@ -31,20 +31,14 @@ public class PhaseCallRunner {
 
             session.setCurrentProject(currentProject);
             session.getSettings().setOffline(phaseCall.isOffline() ? true : pluginExecutionOfflineMode);
-            ProfileManager profileManager = new DefaultProfileManager(session.getContainer(),
-                    phaseCall.getProperties());
+            ProfileManager profileManager = new DefaultProfileManager(session.getContainer());
             profileManager.explicitlyActivate(phaseCall.getProfiles());
-            MavenExecutionRequest request = new DefaultMavenExecutionRequest(
-                    session.getLocalRepository(), session.getSettings(),
-                    session.getEventDispatcher(),
-                    phaseCall.getPhases(), userDir.getPath(),
-                    profileManager, session.getExecutionProperties(),
-                    project.getProperties(), true);
+            MavenExecutionRequest request = new DefaultMavenExecutionRequest();
             if (!phaseCall.isRecursive()) {
                 request.setRecursive(false);
             }
-            request.setPomFile(new File(currentProject.getBasedir(), "pom.xml").getPath());
-            ((Maven) session.lookup(Maven.ROLE)).execute(request);
+            //request.setPomFile(new File(currentProject.getBasedir(), "pom.xml").getPath());
+            //((Maven) session.lookup(Maven.ROLE)).execute(request);
             console.writeInfo("Current project: " + project.getArtifactId());
             return true;
         } catch (Exception e) {

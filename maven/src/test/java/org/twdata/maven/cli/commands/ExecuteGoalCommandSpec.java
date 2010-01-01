@@ -14,6 +14,7 @@ public class ExecuteGoalCommandSpec extends Specification<Void> {
             HashMap<String, String> userDefinedGoal = new HashMap<String, String>();
             userDefinedGoal.put("all", "clean compile test");
 
+            //TODO: This last parameter should be a MavenPluginManager, but how do we get that in a unit test?
             command = new ExecuteGoalCommand(null, null, null, userDefinedGoal, null);
         }
 

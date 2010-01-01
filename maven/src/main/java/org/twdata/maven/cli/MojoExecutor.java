@@ -3,16 +3,20 @@ package org.twdata.maven.cli;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.plugin.*;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.*;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.component.annotations.Requirement;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Executes an arbitrary mojo using a fluent interface.  This is meant to be executed within the context of a Maven 2
@@ -88,18 +92,38 @@ public class MojoExecutor {
                 }
             }
 
-            PluginDescriptor pluginDescriptor = env.getPluginManager().verifyPlugin(plugin, env.getMavenProject(), session.getSettings(), session.getLocalRepository());
+            RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+            repositoryRequest.setLocalRepository( session.getLocalRepository() );
+            repositoryRequest.setRemoteRepositories( env.getMavenProject().getPluginArtifactRepositories() );
+
+            //OLD PluginDescriptor pluginDescriptor = env.getPluginManager().verifyPlugin(plugin, env.getMavenProject(), session.getSettings(), session.getLocalRepository());
+            PluginDescriptor pluginDescriptor = mavenPluginManager.getPluginDescriptor(plugin, repositoryRequest);
+
             MojoExecution exec = null;
             MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo(goal);
             if (mojoDescriptor == null)
             {
                 throw new MojoExecutionException("Unknown mojo goal: "+goal);
             }
-            if (executionId != null) {
-                exec = new MojoExecution(mojoDescriptor, executionId);
-            } else {
-                exec = new MojoExecution(mojoDescriptor, configuration);
-            }
+//            if (executionId != null) {
+//                exec = new MojoExecution(mojoDescriptor, executionId);
+//            } else {
+//                exec = new MojoExecution(mojoDescriptor, configuration);
+//            }
+            exec = new MojoExecution(plugin, goal, executionId);
+            exec.setMojoDescriptor(mojoDescriptor);
+
+            ArtifactFilter artifactFilter = new ArtifactFilter()
+              {
+
+                  public boolean include( Artifact artifact )
+                  {
+                      return true;
+                  }
+              };
+
+            mavenPluginManager.setupPluginRealm( pluginDescriptor, session, Thread.currentThread().getContextClassLoader(),
+                                            Collections.<String> emptyList(), artifactFilter );
 
             Mojo mojo = mavenPluginManager.getConfiguredMojo(Mojo.class, env.getMavenSession(), exec);
             mojo.execute();

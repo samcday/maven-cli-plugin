@@ -18,7 +18,7 @@ public class PhaseCallBuilderSpec extends Specification<PhaseCallBuilder> {
     private Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     private Map<String, String> userAliases = new HashMap<String, String>();
     private PhaseCallBuilder builder =
-            new PhaseCallBuilder(defaultProject, modules, userAliases);
+            new PhaseCallBuilder(defaultProject, modules, userAliases, false);
 
     public class WhenInputtingWithExtraSpaces {
         public void willRemoveSpacesInParsing() {

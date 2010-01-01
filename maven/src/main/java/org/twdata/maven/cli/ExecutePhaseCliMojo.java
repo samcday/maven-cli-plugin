@@ -22,6 +22,13 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
      */
     private Map<String, String> userAliases = new HashMap<String, String>();
 
+    /**
+     * Whether a failure should be ignored
+     *
+     * @parameter expression="${cli.ignore.failures}" default-value="true"
+     */
+    private boolean ignoreFailures;
+
     @Override
     protected void beforeExecute() {
         compactWhiteSpacesInUserAliases();
@@ -37,10 +44,10 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
     @Override
     protected Command getSpecializedCliMojoCommand() {
         PhaseCallBuilder phaseCallBuilder =
-                new PhaseCallBuilder(project, modules, userAliases);
+                new PhaseCallBuilder(project, modules, userAliases, ignoreFailures);
         PhaseCallRunner runner = new PhaseCallRunner(session, project);
 
         return new ExecutePhaseCommand(userAliases.keySet(), modules.keySet(),
-                phaseCallBuilder, runner);
+                phaseCallBuilder, runner, ignoreFailures);
     }
 }

@@ -1,12 +1,5 @@
 package org.twdata.maven.cli;
 
-import java.util.List;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.project.MavenProject;
 import static org.twdata.maven.cli.MojoExecutor.artifactId;
 import static org.twdata.maven.cli.MojoExecutor.configuration;
 import static org.twdata.maven.cli.MojoExecutor.executeMojo;
@@ -15,8 +8,14 @@ import static org.twdata.maven.cli.MojoExecutor.goal;
 import static org.twdata.maven.cli.MojoExecutor.groupId;
 import static org.twdata.maven.cli.MojoExecutor.plugin;
 import static org.twdata.maven.cli.MojoExecutor.version;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.annotations.Component;
+
+import java.util.List;
+
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 public class MojoCall {
     private String groupId;
@@ -31,16 +30,13 @@ public class MojoCall {
         this.mavenPluginManager = mavenPluginManager;
     }
 
-    public void run(MavenProject project, MavenSession session, PluginManager pluginManager)
+    public void run(MavenProject project, MavenSession session)
             throws MojoExecutionException {
-//      MojoExecutionException mojoDescriptor = new MojoDescriptor();
-//      MojoExecution execution = new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
-//      pluginManager.executeMojo(project, execution, session);
         executeMojo(
                 plugin(groupId(groupId), artifactId(artifactId), version(getVersion(project))),
                 goal(goal),
                 configuration(),
-                executionEnvironment(project, session, pluginManager), mavenPluginManager);
+                executionEnvironment(project, session), mavenPluginManager);
     }
 
     /**
@@ -53,7 +49,6 @@ public class MojoCall {
     private String getVersion(MavenProject project) {
         String version = null;
 
-        @SuppressWarnings("unchecked")
         List<Plugin> plugins = project.getBuildPlugins();
 
         for (Plugin plugin : plugins) {

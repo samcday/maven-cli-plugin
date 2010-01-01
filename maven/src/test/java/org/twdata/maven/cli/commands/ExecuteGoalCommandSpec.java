@@ -15,7 +15,7 @@ public class ExecuteGoalCommandSpec extends Specification<Void> {
             userDefinedGoal.put("all", "clean compile test");
 
             //TODO: This last parameter should be a MavenPluginManager, but how do we get that in a unit test?
-            command = new ExecuteGoalCommand(null, null, null, userDefinedGoal, null);
+            command = new ExecuteGoalCommand(null, null, userDefinedGoal, null);
         }
 
         public void shouldMatchWhenSpecifiedRequestIsOneOfThePredefinedGoals() {

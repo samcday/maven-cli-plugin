@@ -23,7 +23,8 @@ public class CommandsCompletor implements Completor {
      * <li>the last token</li>
      * </ul>
      */
-    public int complete(String buffer, int cursor, List candidates) {
+    @SuppressWarnings("unchecked")
+	public int complete(String buffer, int cursor, List candidates) {
         String completionToken = buffer;
 
         String[] tokens = buffer.split(" ");

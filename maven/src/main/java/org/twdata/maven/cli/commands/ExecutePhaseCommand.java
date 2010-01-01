@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.twdata.maven.cli.CommandTokenCollector;
-import org.twdata.maven.cli.console.CliConsole;
 import org.twdata.maven.cli.PhaseCall;
 import org.twdata.maven.cli.PhaseCallRunner;
+import org.twdata.maven.cli.console.CliConsole;
 
 public class ExecutePhaseCommand implements Command {
     private final Set<String> modules;
@@ -102,7 +103,8 @@ public class ExecutePhaseCommand implements Command {
         return false;
     }
 
-    public boolean run(String request, CliConsole console) {
+    @SuppressWarnings("finally")
+	public boolean run(String request, CliConsole console) {
         try {
             List<PhaseCall> calls = new ArrayList<PhaseCall>();
             calls = phaseCallBuilder.parseCommand(request);

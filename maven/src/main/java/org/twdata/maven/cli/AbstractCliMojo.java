@@ -1,7 +1,7 @@
 package org.twdata.maven.cli;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,21 +9,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.commands.ExitCommand;
 import org.twdata.maven.cli.commands.HelpCommand;
 import org.twdata.maven.cli.commands.ListProjectsCommand;
 import org.twdata.maven.cli.console.JLineCliConsole;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 
 public abstract class AbstractCliMojo extends AbstractMojo {
     /**
@@ -56,7 +52,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
      * @parameter expression="${reactorProjects}"
      * @readonly
      */
-    private List reactorProjects;
+    private List<?> reactorProjects;
 
     /**
      * Command prompt text.

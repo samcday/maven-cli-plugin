@@ -1,7 +1,7 @@
 package org.twdata.maven.cli;
 
 import java.io.File;
-import org.apache.maven.Maven;
+
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;

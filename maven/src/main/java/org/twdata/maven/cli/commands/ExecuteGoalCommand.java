@@ -3,21 +3,24 @@ package org.twdata.maven.cli.commands;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.PluginManager;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.MojoCall;
 import org.twdata.maven.cli.console.CliConsole;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 public class ExecuteGoalCommand implements Command {
     private final Map<String, String> defaultGoals = Collections
             .unmodifiableMap(new HashMap<String, String>() {
-                {
+
+				private static final long serialVersionUID = 4990328918982214287L;
+
+				{
                     put("compile",
                             "org.apache.maven.plugins:maven-compiler-plugin:compile");
                     put("testCompile",
@@ -61,14 +64,12 @@ public class ExecuteGoalCommand implements Command {
     private final Map<String, String> userDefinedAliases;
     private final MavenProject project;
     private final MavenSession session;
-    private final PluginManager pluginManager;
     private final MavenPluginManager mavenPluginManager;
 
     public ExecuteGoalCommand(MavenProject project, MavenSession session,
-            PluginManager pluginManager, Map<String, String> userDefinedAliases, MavenPluginManager mavenPluginManager) {
+            Map<String, String> userDefinedAliases, MavenPluginManager mavenPluginManager) {
         this.project = project;
         this.session = session;
-        this.pluginManager = pluginManager;
         this.userDefinedAliases = userDefinedAliases;
         this.mavenPluginManager = mavenPluginManager;
     }
@@ -127,7 +128,7 @@ public class ExecuteGoalCommand implements Command {
         console.writeInfo("Executing: " + call);
         long start = System.currentTimeMillis();
 
-        call.run(project, session, pluginManager);
+        call.run(project, session);
 
         long now = System.currentTimeMillis();
         console.writeInfo("Current project: " + project.getArtifactId());

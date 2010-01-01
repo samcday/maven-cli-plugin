@@ -1,22 +1,25 @@
 package org.twdata.maven.cli;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.*;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Executes an arbitrary mojo using a fluent interface.  This is meant to be executed within the context of a Maven 2
@@ -55,12 +58,12 @@ public class MojoExecutor {
      * @throws MojoExecutionException If there are any exceptions locating or executing the mojo
      */
     public static void executeMojo(Plugin plugin, String goal, Xpp3Dom configuration, ExecutionEnvironment env, MavenPluginManager mavenPluginManager) throws MojoExecutionException {
-        Map executionMap = null;
+        Map<String, PluginExecution> executionMap = null;
         try {
             MavenSession session = env.getMavenSession();
 
 
-            List buildPlugins = env.getMavenProject().getBuildPlugins();
+            List<?> buildPlugins = env.getMavenProject().getBuildPlugins();
 
             String executionId = null;
             if (goal != null && goal.length() > 0 && goal.indexOf('#') > -1)
@@ -76,7 +79,7 @@ public class MojoExecutor {
             // the pom so that the merge happens correctly
             if (buildPlugins != null && executionId == null)
             {
-                for ( Iterator iterator = buildPlugins.iterator(); iterator.hasNext(); )
+                for ( Iterator<?> iterator = buildPlugins.iterator(); iterator.hasNext(); )
                 {
                     Plugin pomPlugin = (Plugin) iterator.next();
 
@@ -145,8 +148,8 @@ public class MojoExecutor {
      * @param pluginManager The Maven plugin manager
      * @return The execution environment
      */
-    public static ExecutionEnvironment executionEnvironment(MavenProject mavenProject, MavenSession mavenSession, PluginManager pluginManager) {
-        return new ExecutionEnvironment(mavenProject, mavenSession, pluginManager);
+    public static ExecutionEnvironment executionEnvironment(MavenProject mavenProject, MavenSession mavenSession) {
+        return new ExecutionEnvironment(mavenProject, mavenSession);
     }
 
     /**
@@ -288,12 +291,10 @@ public class MojoExecutor {
     public static class ExecutionEnvironment {
         private final MavenProject mavenProject;
         private final MavenSession mavenSession;
-        private final PluginManager pluginManager;
 
-        public ExecutionEnvironment(MavenProject mavenProject, MavenSession mavenSession, PluginManager pluginManager) {
+        public ExecutionEnvironment(MavenProject mavenProject, MavenSession mavenSession) {
             this.mavenProject = mavenProject;
             this.mavenSession = mavenSession;
-            this.pluginManager = pluginManager;
         }
 
         public MavenProject getMavenProject() {
@@ -302,10 +303,6 @@ public class MojoExecutor {
 
         public MavenSession getMavenSession() {
             return mavenSession;
-        }
-
-        public PluginManager getPluginManager() {
-            return pluginManager;
         }
     }
 }

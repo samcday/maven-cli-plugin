@@ -3,11 +3,12 @@ package org.twdata.maven.cli;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import org.codehaus.plexus.util.StringUtils;
+
+import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.StringUtils;
 import org.twdata.maven.cli.commands.Command;
 import org.twdata.maven.cli.console.CliConsole;
-import org.apache.maven.plugin.MojoFailureException;
 
 public class CliShell {
     private final List<Command> commands;

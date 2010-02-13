@@ -30,6 +30,8 @@ public class PhaseCallBuilder {
             if (modules.containsKey(token)) {
                 currentPhaseCall = addProject(phases, currentPhaseCall,
                         modules.get(token));
+            } else if (token.startsWith("-D")) {
+                addProperty(phases, currentPhaseCall, token);
             } else if (token.contains("*")) {
                 String regexToken = token.replaceAll("\\*", ".*");
                 for (String moduleName : modules.keySet()) {
@@ -44,8 +46,6 @@ public class PhaseCallBuilder {
                 disableRecursive(phases, currentPhaseCall);
             } else if (token.equals("-S")) {
                 addProperty(phases, currentPhaseCall, "-Dmaven.test.skip=true");
-            } else if (token.startsWith("-D")) {
-                addProperty(phases, currentPhaseCall, token);
             } else if (token.startsWith("-P")) {
                 addProfile(phases, currentPhaseCall, token);
             } else {

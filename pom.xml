@@ -182,7 +182,7 @@ Copyright [2009] [Don Brown, Matthew McCullough]
 
     <scm>
         <connection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</connection>
-        <developerConnection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</connection>
+        <developerConnection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</developerConnection>
         <url>scm:git:git://github.com/mrdon/maven-cli-plugin.git</url>
     </scm>
 

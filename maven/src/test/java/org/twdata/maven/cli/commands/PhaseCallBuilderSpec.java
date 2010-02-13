@@ -88,6 +88,11 @@ public class PhaseCallBuilderSpec extends Specification<PhaseCallBuilder> {
                     aPhaseCall().runsOffline());
         }
 
+        public void willBuildOneCommandWhenPropertySwitchWithAsteriskIsSpecified() {
+            assertPhaseCalls(builder.parseCommand("-Dabcd=def*"),
+                    aPhaseCall().hasProperties("abcd=def*"));
+        }
+
         public void willBuildNothingWhenNoKeyValueSpecifiedAfterPropertySwitch() {
             specify(builder.parseCommand("-D").size(), should.equal(0));
         }

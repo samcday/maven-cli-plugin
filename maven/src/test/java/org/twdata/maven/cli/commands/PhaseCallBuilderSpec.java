@@ -54,6 +54,20 @@ public class PhaseCallBuilderSpec extends Specification<PhaseCallBuilder> {
         }
     }
 
+    public class WhenQuotesArePresent {
+        public void willBuildOneCommandWhenPropertyHasNoWhitespace() {
+            assertPhaseCalls(builder.parseCommand("-Dabc=\"def\""), aPhaseCall().hasProperties("abc=\"def\""));
+        }
+        public void willBuildOneCommandWhenPropertyHasWhitespacePreserved() {
+            assertPhaseCalls(builder.parseCommand("-Dabc=\"def \n ghi\""), aPhaseCall().hasProperties("abc=\"def \n ghi\""));
+        }
+        public void willBuildOneCommandWhenTwoPropertiesHaveWhitespacePreserved() {
+            assertPhaseCalls(builder.parseCommand("-Dabc=\"def \n ghi\" -Djkl=\"mno pqr\""),
+                    aPhaseCall().hasProperties("abc=\"def \n ghi\""),
+                    aPhaseCall().hasProperties("jkl=\"mno pqr\""));
+        }
+    }
+
     public class WhenOnlySwitchesAreSpecified {
         public void willBuildOneCommandWhenOnlyOfflineSwitchIsSpecified() {
             assertPhaseCalls(builder.parseCommand("-o"), aPhaseCall().runsOffline());

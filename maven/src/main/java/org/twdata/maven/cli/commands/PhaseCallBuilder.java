@@ -1,8 +1,7 @@
 package org.twdata.maven.cli.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,7 +59,10 @@ public class PhaseCallBuilder {
     private List<String> resolveUserAliases(String text) {
         List<String> result = new ArrayList<String>();
 
-        for (String token : text.split("\\s")) {
+        for (String token : splitByWhitespaceEscapingQuotes(text)) {
+            if ("".equals(token)) {
+                continue;
+            }
             if (userAliases.containsKey(token)) {
                 result.addAll(resolveUserAliases(userAliases.get(token)));
             } else if (!StringUtils.isEmpty(token)) {
@@ -69,6 +71,54 @@ public class PhaseCallBuilder {
         }
 
         return result;
+    }
+
+    private Iterable<String> splitByWhitespaceEscapingQuotes(final String text) {
+        return new Iterable<String>() {
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    final Matcher m = Pattern.compile("\\s").matcher(text);
+                    int next = 0;
+                    public boolean hasNext() {
+                        return next < text.length();
+                    }
+                    public String next() {
+                        String s = nextInternal();
+                        while (s != null && count(s, '"') % 2 == 1 && hasNext()) {
+                            s += m.group() + nextInternal();
+                        }
+                        return s;
+                    }
+                    private String nextInternal() {
+                        if (!hasNext()) {
+                            return null;
+                        }
+                        boolean found = m.find(next);
+                        if (found) {
+                            String s = text.substring(next, m.start());
+                            next = m.end();
+                            return s;
+                        } else {
+                            String s = text.substring(next);
+                            next = text.length();
+                            return s;
+                        }
+                    }
+                    private int count(final String s, final char ch) {
+                        int total = 0;
+                        int pos = s.indexOf(ch);
+                        while (pos >= 0) {
+                            total++;
+                            pos = s.indexOf(ch, pos + 1);
+                        }
+                        return total;
+                    }
+                    public void remove() {
+                        throw new UnsupportedOperationException();  //To change body of created methods use File | Settings | File Templates.
+                    }
+                };
+            }
+        };
     }
 
     private PhaseCall addProject(List<PhaseCall> phases, PhaseCall currentPhaseCall, MavenProject project) {

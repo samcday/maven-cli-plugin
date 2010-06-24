@@ -73,52 +73,8 @@ public class PhaseCallBuilder {
         return result;
     }
 
-    private Iterable<String> splitByWhitespaceEscapingQuotes(final String text) {
-        return new Iterable<String>() {
-            public Iterator<String> iterator() {
-                return new Iterator<String>() {
-                    final Matcher m = Pattern.compile("\\s").matcher(text);
-                    int next = 0;
-                    public boolean hasNext() {
-                        return next < text.length();
-                    }
-                    public String next() {
-                        String s = nextInternal();
-                        while (s != null && count(s, '"') % 2 == 1 && hasNext()) {
-                            s += m.group() + nextInternal();
-                        }
-                        return s;
-                    }
-                    private String nextInternal() {
-                        if (!hasNext()) {
-                            return null;
-                        }
-                        boolean found = m.find(next);
-                        if (found) {
-                            String s = text.substring(next, m.start());
-                            next = m.end();
-                            return s;
-                        } else {
-                            String s = text.substring(next);
-                            next = text.length();
-                            return s;
-                        }
-                    }
-                    private int count(final String s, final char ch) {
-                        int total = 0;
-                        int pos = s.indexOf(ch);
-                        while (pos >= 0) {
-                            total++;
-                            pos = s.indexOf(ch, pos + 1);
-                        }
-                        return total;
-                    }
-                    public void remove() {
-                        throw new UnsupportedOperationException();  //To change body of created methods use File | Settings | File Templates.
-                    }
-                };
-            }
-        };
+    private Iterable<String> splitByWhitespaceEscapingQuotes(String text) {
+        return new CommandTokenizer(text);
     }
 
     private PhaseCall addProject(List<PhaseCall> phases, PhaseCall currentPhaseCall, MavenProject project) {

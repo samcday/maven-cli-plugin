@@ -65,7 +65,7 @@ public class ExecutePhaseCommand implements Command {
     }
 
     public boolean matchesRequest(String request) {
-        for (String token : request.split(" ")) {
+        for (String token : new CommandTokenizer(request)) {
             if (!phasesAndProperties.contains(token) && !token.startsWith("-D")
                     && !token.startsWith("-P") && !userAliases.contains(token)
                     && !matchesModules(token) && isInvalidPluginGoalCommand(token)) {

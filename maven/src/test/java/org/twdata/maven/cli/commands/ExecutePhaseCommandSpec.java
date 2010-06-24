@@ -21,8 +21,12 @@ public class ExecutePhaseCommandSpec extends Specification<Void> {
             specify(command.matchesRequest("-o build"), should.equal(false));
         }
 
-        public void shouleNotRejectKeyValuesOfProperties() {
+        public void shouldNotRejectKeyValuesOfProperties() {
             specify(command.matchesRequest("-Dabcd=def"), should.equal(true));
+        }
+
+        public void shouldNotRejectQuotedPropertyValuesWithWhitespace() {
+            specify(command.matchesRequest("-Dabcd=\"def ghi\""), should.equal(true));
         }
 
         public void shouldNotRejectProfileInput() {

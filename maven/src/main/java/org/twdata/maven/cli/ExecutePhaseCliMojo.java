@@ -25,7 +25,7 @@ public class ExecutePhaseCliMojo extends AbstractCliMojo {
     /**
      * Whether a failure should be ignored
      *
-     * @parameter expression="${cli.ignore.failures}" default-value="true"
+     * @parameter expression="${cli.ignore.failures}" default-value="false"
      */
     private boolean ignoreFailures;
 

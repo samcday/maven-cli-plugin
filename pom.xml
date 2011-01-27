@@ -201,6 +201,7 @@ Copyright [2009] [Don Brown, Matthew McCullough]
     </scm>
 
     <properties>
+        <maven.version>3.0.2</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>

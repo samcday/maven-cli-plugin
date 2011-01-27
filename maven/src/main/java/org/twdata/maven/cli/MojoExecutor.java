@@ -5,10 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -55,6 +53,7 @@ public class MojoExecutor {
      * @param goal The goal to execute
      * @param configuration The execution configuration
      * @param env The execution environment
+     * @param mavenPluginManager The Maven plugin manager
      * @throws MojoExecutionException If there are any exceptions locating or executing the mojo
      */
     public static void executeMojo(Plugin plugin, String goal, Xpp3Dom configuration, ExecutionEnvironment env, MavenPluginManager mavenPluginManager) throws MojoExecutionException {
@@ -100,7 +99,10 @@ public class MojoExecutor {
             repositoryRequest.setRemoteRepositories( env.getMavenProject().getPluginArtifactRepositories() );
 
             //OLD PluginDescriptor pluginDescriptor = env.getPluginManager().verifyPlugin(plugin, env.getMavenProject(), session.getSettings(), session.getLocalRepository());
-            PluginDescriptor pluginDescriptor = mavenPluginManager.getPluginDescriptor(plugin, repositoryRequest);
+            PluginDescriptor pluginDescriptor =
+                    mavenPluginManager.getPluginDescriptor(plugin,
+                            session.getCurrentProject().getRemotePluginRepositories(),
+                            session.getRepositorySession());
 
             MojoExecution exec = null;
             MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo(goal);
@@ -116,17 +118,8 @@ public class MojoExecutor {
             exec = new MojoExecution(plugin, goal, executionId);
             exec.setMojoDescriptor(mojoDescriptor);
 
-            ArtifactFilter artifactFilter = new ArtifactFilter()
-              {
-
-                  public boolean include( Artifact artifact )
-                  {
-                      return true;
-                  }
-              };
-
             mavenPluginManager.setupPluginRealm( pluginDescriptor, session, Thread.currentThread().getContextClassLoader(),
-                                            Collections.<String> emptyList(), artifactFilter );
+                                            Collections.<String> emptyList(), null );
 
             Mojo mojo = mavenPluginManager.getConfiguredMojo(Mojo.class, env.getMavenSession(), exec);
             mojo.execute();
@@ -145,7 +138,6 @@ public class MojoExecutor {
      * Constructs the {@link ExecutionEnvironment} instance fluently
      * @param mavenProject The current Maven project
      * @param mavenSession The current Maven session
-     * @param pluginManager The Maven plugin manager
      * @return The execution environment
      */
     public static ExecutionEnvironment executionEnvironment(MavenProject mavenProject, MavenSession mavenSession) {

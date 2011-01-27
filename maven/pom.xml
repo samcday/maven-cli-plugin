@@ -20,15 +20,13 @@
 
         <dependency>
           <groupId>org.apache.maven</groupId>
-          <artifactId>maven-project</artifactId>
-          <version>3.0-alpha-2</version>
-          <!-- Might want the version as SNAPSHOT to track the latest as Maven 3 evolves -->
+          <artifactId>maven-compat</artifactId>
+          <version>${maven.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-core</artifactId>
-          <version>3.0-alpha-5</version>
-          <!-- Might want the version as SNAPSHOT to track the latest as Maven 3 evolves -->
+          <version>${maven.version}</version>
         </dependency>
 
 

@@ -39,7 +39,7 @@ public class PhaseCallRunner {
                     session.getEventDispatcher(),
                     phaseCall.getPhases(), userDir.getPath(),
                     profileManager, session.getExecutionProperties(),
-                    project.getProperties(), true);
+                    currentProject.getProperties(), true);
             if (!phaseCall.isRecursive()) {
                 request.setRecursive(false);
             }

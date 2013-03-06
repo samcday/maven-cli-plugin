@@ -73,6 +73,10 @@ Copyright [2009] [Don Brown, Matthew McCullough]
       <contributor>
         <name>Vincent Beretti</name>
       </contributor>
+      <contributor>
+        <name>David Rizzuto</name>
+        <email>drizzuto@atlassian.com</email>
+      </contributor>
     </contributors>
     
     <modules>

@@ -1,3 +1,6 @@
+1.0.7
+* Fixed broken repository URL for laughingpanda.org
+
 1.0.2-SNAPSHOT on the maven3compat branch
 * Adding Maven 3.0 support for this plugin.  Rudimentary in form right now.  Needs volunteers to clean up and write unit tests for MojoExecutor.java
 

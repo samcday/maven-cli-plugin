@@ -58,6 +58,11 @@ Copyright [2009] [Don Brown, Matthew McCullough]
         <name>James Roper</name>
         <organization>Atlassian</organization>
       </developer>
+        <developer>
+            <id>doklovic</id>
+            <name>Jonathan Doklovic</name>
+            <organization>Atlassian</organization>
+        </developer>
       <developer>
         <id>matthewmccullough</id>
         <name>Matthew McCullough</name>

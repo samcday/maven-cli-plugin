@@ -6,6 +6,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.project.MavenProject;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
+
 import static org.twdata.maven.mojoexecutor.MojoExecutor.artifactId;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.configuration;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.executeMojo;
@@ -26,13 +28,13 @@ public class MojoCall {
         this.goal = goal;
     }
 
-    public void run(MavenProject project, MavenSession session, PluginManager pluginManager)
+    public void run(MavenProject project, MavenSession session, MojoExecutor.ExecutionEnvironment executionEnvironment)
             throws MojoExecutionException {
         executeMojo(
                 plugin(groupId(groupId), artifactId(artifactId), version(getVersion(project))),
                 goal(goal),
                 configuration(),
-                executionEnvironment(project, session, pluginManager));
+                executionEnvironment);
     }
 
     /**

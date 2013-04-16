@@ -1,13 +1,21 @@
 package org.twdata.maven.cli;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.Maven;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class PhaseCallRunner {
@@ -31,20 +39,97 @@ public class PhaseCallRunner {
 
             session.setCurrentProject(currentProject);
             session.getSettings().setOffline(phaseCall.isOffline() ? true : pluginExecutionOfflineMode);
-            ProfileManager profileManager = new DefaultProfileManager(session.getContainer(),
-                    phaseCall.getProperties());
+            ProfileManager profileManager = new DefaultProfileManager(session.getContainer(), phaseCall.getProperties());
             profileManager.explicitlyActivate(phaseCall.getProfiles());
-            MavenExecutionRequest request = new DefaultMavenExecutionRequest(
-                    session.getLocalRepository(), session.getSettings(),
-                    session.getEventDispatcher(),
-                    phaseCall.getPhases(), userDir.getPath(),
-                    profileManager, session.getExecutionProperties(),
-                    currentProject.getProperties(), true);
+
+            Settings settings = session.getSettings();
+            
+            Class<DefaultMavenExecutionRequest> merClass = DefaultMavenExecutionRequest.class;
+            Constructor[] ctrs = merClass.getConstructors();
+
+            MavenExecutionRequest request = null;
+            Method pomMethod = null;
+            if(ctrs[0].getParameterTypes().length < 1)
+            {
+                request = merClass.newInstance();
+                
+                request.setLocalRepository(session.getLocalRepository());
+                request.setOffline( session.isOffline() );
+                request.setInteractiveMode( settings.isInteractiveMode() );
+                request.setProxies( settings.getProxies() );
+                request.setServers( settings.getServers() );
+                request.setMirrors( settings.getMirrors() );
+                request.setPluginGroups( session.getPluginGroups() );
+                request.setGoals( phaseCall.getPhases() );
+                request.setSystemProperties( session.getSystemProperties() );
+                request.setUserProperties( session.getUserProperties() );
+                request.setActiveProfiles( profileManager.getActiveProfiles() );
+
+                pomMethod = request.getClass().getMethod("setPom",File.class);
+                pomMethod.invoke(request,new File(currentProject.getBasedir(), "pom.xml"));
+            }
+            else
+            {
+                Constructor<DefaultMavenExecutionRequest> ctr = merClass.getConstructor(new Class[]{
+                        ArtifactRepository.class
+                        ,Settings.class
+                        , EventDispatcher.class
+                        ,List.class
+                        ,String.class
+                        ,ProfileManager.class
+                        , Properties.class
+                        ,Properties.class
+                        ,Boolean.TYPE
+                });
+                
+                request = ctr.newInstance(
+                        session.getLocalRepository()
+                        ,session.getSettings()
+                        ,session.getEventDispatcher()
+                        ,phaseCall.getPhases()
+                        ,userDir.getPath()
+                        ,profileManager
+                        ,session.getExecutionProperties()
+                        ,currentProject.getProperties()
+                        ,true
+                );
+
+                pomMethod = request.getClass().getMethod("setPomFile",String.class);
+                pomMethod.invoke(request,new File(currentProject.getBasedir(), "pom.xml").getPath());
+            }
+
             if (!phaseCall.isRecursive()) {
                 request.setRecursive(false);
             }
-            request.setPomFile(new File(currentProject.getBasedir(), "pom.xml").getPath());
-            ((Maven) session.lookup(Maven.ROLE)).execute(request);
+            
+            Maven mvn = (Maven) session.lookup(Maven.class.getName());
+            Method execMethod = mvn.getClass().getMethod("execute",MavenExecutionRequest.class);
+            
+            Class returnClass = execMethod.getReturnType();
+            Object result = execMethod.invoke(mvn,request);
+            
+            if(returnClass.getSimpleName().equals("MavenExecutionResult"))
+            {
+                Method prjMethod = result.getClass().getMethod("getProject");
+                MavenProject resultProject = (MavenProject) prjMethod.invoke(result);
+                
+                Method bsMethod = result.getClass().getMethod("getBuildSummary",MavenProject.class);
+                Object summary = bsMethod.invoke(result,resultProject);
+                if(summary.getClass().getSimpleName().equals("BuildSuccess"))
+                {
+                    console.writeInfo("------------------------------------------------------------------------");
+                    console.writeInfo("BUILD SUCCESSFUL");
+                    console.writeInfo("------------------------------------------------------------------------");
+                }
+                else
+                {
+                    console.writeInfo("------------------------------------------------------------------------");
+                    console.writeInfo("BUILD ERROR");
+                    console.writeInfo("------------------------------------------------------------------------");
+                    return false;
+                }
+            }
+            
             console.writeInfo("Current project: " + project.getArtifactId());
             return true;
         } catch (Exception e) {

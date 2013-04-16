@@ -120,7 +120,15 @@ public class ExecutePhaseCommand implements Command {
             }
         } catch (IllegalArgumentException ex) {
             console.writeError("Invalid command: " + request);
-        } finally {
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            console.writeError("Invalid command: " + request);
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+            console.writeError("Invalid command: " + request);
+        }
+        finally {
             return true;
         }
     }

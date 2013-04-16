@@ -10,6 +10,7 @@ import org.apache.maven.project.MavenProject;
 import org.twdata.maven.cli.CommandTokenCollector;
 import org.twdata.maven.cli.MojoCall;
 import org.twdata.maven.cli.console.CliConsole;
+import org.twdata.maven.mojoexecutor.MojoExecutor;
 
 public class ExecuteGoalCommand implements Command {
     private final Map<String, String> defaultGoals = Collections
@@ -58,13 +59,13 @@ public class ExecuteGoalCommand implements Command {
     private final Map<String, String> userDefinedAliases;
     private final MavenProject project;
     private final MavenSession session;
-    private final PluginManager pluginManager;
+    private final MojoExecutor.ExecutionEnvironment executionEnvironment;
 
     public ExecuteGoalCommand(MavenProject project, MavenSession session,
-            PluginManager pluginManager, Map<String, String> userDefinedAliases) {
+            MojoExecutor.ExecutionEnvironment executionEnvironment, Map<String, String> userDefinedAliases) {
         this.project = project;
         this.session = session;
-        this.pluginManager = pluginManager;
+        this.executionEnvironment = executionEnvironment;
         this.userDefinedAliases = userDefinedAliases;
     }
 
@@ -122,7 +123,7 @@ public class ExecuteGoalCommand implements Command {
         console.writeInfo("Executing: " + call);
         long start = System.currentTimeMillis();
 
-        call.run(project, session, pluginManager);
+        call.run(project, session, executionEnvironment);
 
         long now = System.currentTimeMillis();
         console.writeInfo("Current project: " + project.getArtifactId());

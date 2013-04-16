@@ -1,3 +1,6 @@
+1.0.8
+* Added basic maven 3 support via mojo-executor plugin
+
 1.0.7
 * Fixed broken repository URL for laughingpanda.org
 

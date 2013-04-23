@@ -129,13 +129,32 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     }
 
     private void displaySocketCliShell() {
+        String foundPort = "";
         if (port != null) {
             try {
-                server = new ServerSocket(Integer.parseInt(port));
+                int requestedPort = Integer.parseInt(port);
+                int plusOne = requestedPort + 1;
+                
+                int finalPort = AvailablePortFinder.getPortOrNextAvailable(requestedPort,plusOne);
+                foundPort = Integer.toString(finalPort);
+                
+                if(requestedPort != finalPort)
+                {
+                    getLog().warn("request port " + requestedPort + " was taken. Using new port: " + finalPort);    
+                }
+                
+                server = new ServerSocket(finalPort);
+                openSocket(server, finalPort);
+                
             } catch (IOException e) {
-                getLog().error("Cannot open port " + port + " for cli server: " + e);
+                getLog().error("Cannot open port " + foundPort + " for cli server: " + e);
+                return;
             }
-            openSocket(server, Integer.parseInt(port));
+            catch (Exception e)
+            {
+                getLog().error(e.getMessage());
+                return;
+            }
         }
     }
 

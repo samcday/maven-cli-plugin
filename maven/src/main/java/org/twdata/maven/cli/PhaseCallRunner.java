@@ -53,17 +53,17 @@ public class PhaseCallRunner {
             {
                 request = merClass.newInstance();
                 
-                request.setLocalRepository(session.getLocalRepository());
-                request.setOffline( session.isOffline() );
-                request.setInteractiveMode( settings.isInteractiveMode() );
-                request.setProxies( settings.getProxies() );
-                request.setServers( settings.getServers() );
-                request.setMirrors( settings.getMirrors() );
-                request.setPluginGroups( session.getPluginGroups() );
-                request.setGoals( phaseCall.getPhases() );
-                request.setSystemProperties( session.getSystemProperties() );
-                request.setUserProperties( session.getUserProperties() );
-                request.setActiveProfiles( profileManager.getActiveProfiles() );
+                request.setLocalRepository(session.getLocalRepository())
+                       .setOffline( session.isOffline() )
+                       .setInteractiveMode( settings.isInteractiveMode() )
+                       .setProxies( settings.getProxies() )
+                       .setServers( settings.getServers() )
+                       .setMirrors( settings.getMirrors() )
+                       .setPluginGroups( session.getPluginGroups() )
+                       .setGoals( phaseCall.getPhases() )
+                       .setSystemProperties( session.getSystemProperties() )
+                       .setUserProperties( session.getUserProperties() )
+                       .setActiveProfiles( profileManager.getActiveProfiles() );
 
                 pomMethod = request.getClass().getMethod("setPom",File.class);
                 pomMethod.invoke(request,new File(currentProject.getBasedir(), "pom.xml"));

@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.twdata.maven</groupId>
             <artifactId>mojo-executor</artifactId>
-            <version>1.5</version>
+            <version>1.5.1-SNAPSHOT</version>
         </dependency>
         
         <dependency>

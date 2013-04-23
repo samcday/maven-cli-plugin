@@ -26,7 +26,7 @@ Copyright [2009] [Don Brown, Matthew McCullough]
     <packaging>pom</packaging>
     <version>1.0.9-SNAPSHOT</version>
     <name>Maven CLI Plugin Parent</name>
-    <url>http://github.com/mrdon/maven-cli-plugin/wikis</url>
+    <url>http://github.com/jdoklovic/maven-cli-plugin/wikis</url>
     
     <licenses>
       <license>
@@ -203,9 +203,9 @@ Copyright [2009] [Don Brown, Matthew McCullough]
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</connection>
-        <developerConnection>scm:git:git://github.com/mrdon/maven-cli-plugin.git</developerConnection>
-        <url>scm:git:git://github.com/mrdon/maven-cli-plugin.git</url>
+        <connection>scm:git:git://github.com/jdoklovic/maven-cli-plugin.git</connection>
+        <developerConnection>scm:git:git://github.com/jdoklovic/maven-cli-plugin.git</developerConnection>
+        <url>scm:git:git://github.com/jdoklovic/maven-cli-plugin.git</url>
     </scm>
 
     <properties>

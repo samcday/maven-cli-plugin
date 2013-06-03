@@ -63,6 +63,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     private boolean acceptSocket = true;
     private ServerSocket server = null;
     private CommandsCompletor commandsCompletor;
+    private MultiOutputStream mos;
 
     protected Map<String, MavenProject> modules = new HashMap<String, MavenProject>();
     protected List<Command> cliCommands = new ArrayList<Command>();
@@ -71,6 +72,12 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     protected abstract Command getSpecializedCliMojoCommand();
 
     public final void execute() throws MojoExecutionException {
+        
+        if(null == mos)
+        {
+            mos = new MultiOutputStream(System.out);
+            System.setOut(new PrintStream(mos));
+        }
         beforeExecute();
         resolveModulesInProject();
         buildCommands();
@@ -169,7 +176,10 @@ public abstract class AbstractCliMojo extends AbstractMojo {
             Socket connection = null;
             try {
                 connection = server.accept();
-                displayShell(connection.getInputStream(), new PrintStream(connection.getOutputStream()));
+                
+                PrintStream socketStream = new PrintStream(connection.getOutputStream());
+                mos.addStream(socketStream);
+                displayShell(connection.getInputStream(), System.out);
             } catch (IOException ex) {
                 getLog().error("Server quit unexpectedly");
                 ex.printStackTrace();

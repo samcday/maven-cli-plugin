@@ -51,7 +51,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String prompt = "maven2";
+    private String prompt = "maven";
 
     /**
      * TCP port to listen to for shell access

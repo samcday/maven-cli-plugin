@@ -44,21 +44,7 @@ public class MultiOutputStream extends OutputStream
     @Override
     public void write(byte[] b) throws IOException
     {
-        for (int i=0; i<outputStreams.size(); i++)
-        {
-            OutputStream out = outputStreams.get(i);
-            if(out.getClass().isAssignableFrom(PrintStream.class))
-            {
-                if(!checkAndWrite((PrintStream) out, b))
-                {
-                    outputStreams.remove(out);
-                }
-            }
-            else
-            {
-                out.write(b);
-            }
-        }
+        write(b, 0, b.length);
     }
 
     @Override
@@ -114,15 +100,7 @@ public class MultiOutputStream extends OutputStream
 
     private boolean checkAndWrite(PrintStream stream, byte[] b) throws IOException
     {
-        if(stream.checkError())
-        {
-            return false;
-        }
-        else
-        {
-            stream.write(b);
-            return true;
-        }
+        return checkAndWrite(stream, b, 0, b.length);
     }
 
     private boolean checkAndWrite(PrintStream stream, byte[] b, int off, int len) throws IOException

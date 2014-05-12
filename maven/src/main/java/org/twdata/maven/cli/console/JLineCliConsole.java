@@ -3,24 +3,23 @@ package org.twdata.maven.cli.console;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.OutputStreamWriter;
 import java.net.SocketException;
-import jline.Completor;
-import jline.ConsoleReader;
+import jline.console.ConsoleReader;
+import jline.console.completer.Completer;
 import org.apache.maven.plugin.logging.Log;
 
 public class JLineCliConsole implements CliConsole {
     private final ConsoleReader consoleReader;
     private final Log logger;
 
-    public JLineCliConsole(InputStream in, PrintStream out, Log logger, Completor completor,
+    public JLineCliConsole(InputStream in, PrintStream out, Log logger, Completer completer,
             String prompt) {
         try {
-            consoleReader = new ConsoleReader(in, new OutputStreamWriter(out));
+            consoleReader = new ConsoleReader(in, out);
             consoleReader.setBellEnabled(false);
-            consoleReader.setDefaultPrompt(prompt + "> ");
+            consoleReader.setPrompt(prompt + "> ");
             this.logger = logger;
-            consoleReader.addCompletor(completor);
+            consoleReader.addCompleter(completer);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to create reader to read commands.", ex);
         }

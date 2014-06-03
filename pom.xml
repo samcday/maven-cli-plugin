@@ -82,6 +82,14 @@ Copyright [2009] [Don Brown, Matthew McCullough]
         <name>David Rizzuto</name>
         <email>drizzuto@atlassian.com</email>
       </contributor>
+      <contributor>
+        <name>Andrew Gaul</name>
+        <email>andrew@gaul.org/email>
+      </contributor>
+      <contributor>
+        <name>Marcos Scriven</name>
+        <email>marcos@scriven.org</email>
+      </contributor>
     </contributors>
     
     <modules>

@@ -51,7 +51,7 @@ public abstract class AbstractCliMojo extends AbstractMojo {
      *
      * @parameter
      */
-    private String prompt = "maven2";
+    private String prompt = "maven";
 
     /**
      * TCP port to listen to for shell access
@@ -166,6 +166,10 @@ public abstract class AbstractCliMojo extends AbstractMojo {
     }
 
     private void displayShell(InputStream in, PrintStream out) {
+        // Display version of Maven being used right before showing the prompt
+        String version = (String)session.getSystemProperties().get("maven.build.version");
+        getLog().info("Using Maven version: " + version);
+
         JLineCliConsole console = new JLineCliConsole(in, out, getLog(), commandsCompletor, prompt);
         new CliShell(cliCommands, console).run();
     }

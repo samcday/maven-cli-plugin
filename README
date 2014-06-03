@@ -1,3 +1,15 @@
+1.0.11
+* Mojo Executor 1.5.2 for Maven 3.1 & 3.2 support
+* Drop Maven version number from command prompt
+* JLine to version 2.11 (allowing reverse history search)
+
+1.0.10
+* Send Maven output to socket connections
+
+1.0.9
+* Mojo Exceutor 1.5.1 for Maven 3.0 support
+* Avoids port clashes
+
 1.0.8
 * Added basic maven 3 support via mojo-executor plugin
 

@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import jline.Completor;
+import jline.console.completer.Completer;
 
-public class CommandsCompletor implements Completor {
+public class CommandsCompletor implements Completer {
 
     private final List<String> availableCommands = new ArrayList<String>();
 

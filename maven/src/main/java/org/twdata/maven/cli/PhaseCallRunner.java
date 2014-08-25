@@ -55,6 +55,8 @@ public class PhaseCallRunner {
                 
                 request.setLocalRepository(session.getLocalRepository())
                        .setOffline( session.isOffline() )
+                       .setRemoteRepositories(project.getRemoteArtifactRepositories())
+                       .setPluginArtifactRepositories(project.getPluginArtifactRepositories())
                        .setInteractiveMode( settings.isInteractiveMode() )
                        .setProxies( settings.getProxies() )
                        .setServers( settings.getServers() )

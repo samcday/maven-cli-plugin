@@ -24,7 +24,7 @@ Copyright [2009] [Don Brown, Matthew McCullough]
     <groupId>org.twdata.maven</groupId>
     <artifactId>maven-cli-plugin-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.12-CONFDEV-24573</version>
+    <version>1.0.12-SNAPSHOT</version>
     <name>Maven CLI Plugin Parent</name>
     <url>http://github.com/jdoklovic/maven-cli-plugin/wikis</url>
     

@@ -200,14 +200,13 @@ Copyright [2009] [Don Brown, Matthew McCullough]
     </pluginRepositories>
     <distributionManagement>
         <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>twdata-m2-repository</id>
-            <url>svn:https://twdata-m2-repository.googlecode.com/svn</url>
-            <!--
-            <id>repository.jboss.org</id>
-            <url>file:///${user.home}/mirror/checkout/jboss-maven2-repo</url>
-            -->
+            <id>atlassian-3rdparty</id>
+            <url>https://maven.atlassian.com/3rdparty</url>
         </repository>
+        <snapshotRepository>
+            <id>atlassian-3rdparty-snapshot</id>
+            <url>https://maven.atlassian.com/3rdparty-snapshot</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <scm>

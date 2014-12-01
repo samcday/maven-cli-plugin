@@ -16,6 +16,8 @@ import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.ExceptionUtils;
+import org.codehaus.plexus.util.ReflectionUtils;
 import org.twdata.maven.cli.console.CliConsole;
 
 public class PhaseCallRunner {
@@ -123,11 +125,35 @@ public class PhaseCallRunner {
                     console.writeInfo("BUILD SUCCESSFUL");
                     console.writeInfo("------------------------------------------------------------------------");
                 }
+                else if (summary.getClass().getSimpleName().equals("BuildFailure"))
+                {
+                    console.writeError("------------------------------------------------------------------------");
+                    console.writeError("BUILD FAILURE");
+                    console.writeError("------------------------------------------------------------------------");
+
+                    try
+                    {
+                        Exception cause = (Exception) ReflectionUtils.getValueIncludingSuperclasses("cause", summary);
+                        if (cause != null)
+                        {
+                            console.writeError(ExceptionUtils.getFullStackTrace(cause));
+                            return false;
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        // Fallback to generic error. :(
+                    }
+
+                    console.writeError("<couldn't determine failure cause>");
+                    return false;
+                }
                 else
                 {
-                    console.writeInfo("------------------------------------------------------------------------");
-                    console.writeInfo("BUILD ERROR");
-                    console.writeInfo("------------------------------------------------------------------------");
+                    console.writeError("------------------------------------------------------------------------");
+                    console.writeError("BUILD ERROR");
+                    console.writeError("------------------------------------------------------------------------");
+                    console.writeError("The build failed for an unhandled reason. Sorry about that.");
                     return false;
                 }
             }
